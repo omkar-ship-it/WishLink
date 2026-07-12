@@ -1,0 +1,77 @@
+export type OccasionType =
+  | 'goodwill'
+  | 'birthday'
+  | 'anniversary'
+  | 'wedding'
+  | 'housewarming'
+  | 'trip'
+
+/** Curated transition library — deliberately small so every combination still feels cinematic, not generic. */
+export type SceneTransition = 'fade' | 'slide-up' | 'zoom-reveal' | 'curtain' | 'iris'
+
+export type SceneLayout = 'text-only' | 'image-only' | 'image-text' | 'quote'
+
+/**
+ * The one primitive every card is built from, regardless of occasion.
+ * A "template" is just a pre-filled sequence of these — same engine, no bespoke code per occasion.
+ */
+export interface Scene {
+  id: string
+  layout: SceneLayout
+  transition: SceneTransition
+  /** How long this scene holds before auto-advancing (ms). Recipient can also tap to advance early. */
+  durationMs: number
+  heading?: string
+  body?: string
+  /** Small attribution line under a quote — e.g. "— Maya Angelou" or the sender's name */
+  attribution?: string
+  imageUrl?: string
+  /** Background treatment when there's no image — a gradient pair tinted to the occasion's accent */
+  background?: { from: string; to: string }
+}
+
+export interface MusicTrack {
+  id: string
+  title: string
+  artist: string
+  fileUrl: string
+  durationSec: number
+  licenseNote: string
+  occasionTags: OccasionType[]
+}
+
+export interface OccasionMeta {
+  type: OccasionType
+  label: string
+  tagline: string
+  emoji: string
+  accentFrom: string
+  accentTo: string
+}
+
+export interface CardTemplate {
+  id: string
+  occasion: OccasionType
+  name: string
+  description: string
+  defaultMusicTrackId: string
+  scenes: Scene[]
+}
+
+export type PrivacyMode = 'open' | 'email_gated'
+
+export interface Card {
+  id: string
+  senderId: string
+  senderName: string
+  occasion: OccasionType
+  title: string
+  recipientName?: string
+  scenes: Scene[]
+  musicTrackId: string | null
+  privacyMode: PrivacyMode
+  recipientEmail?: string | null
+  shareSlug: string
+  viewCount: number
+  createdAt: string
+}

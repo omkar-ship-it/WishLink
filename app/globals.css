@@ -1,0 +1,69 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* ── Brand chrome (marketing site / builder / dashboard) ── */
+  --color-bg:        #FFFBF6;
+  --color-surface:   #FFFFFF;
+  --color-surface-2: #FBF3EC;
+  --color-border:    #F0E4D8;
+  --color-text:      #2B2140;
+  --color-text-2:    #7A7089;
+  --color-text-3:    #A79FB5;
+  --color-brand:     #D14D72;
+  --color-brand-l:   #E8738F;
+  --color-brand-d:   #A3324F;
+  --color-gold:      #D9A441;
+  --color-gold-d:    #B5822C;
+  --color-success:   #16A34A;
+  --color-danger:    #DC2626;
+
+  --font-sans:    var(--font-jakarta);
+  --font-display: var(--font-fraunces);
+
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility; }
+
+body {
+  font-family: var(--font-sans, 'Plus Jakarta Sans', sans-serif);
+  background: #FFFBF6;
+  color: #2B2140;
+}
+
+.font-display { font-family: var(--font-display, 'Fraunces', serif); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #F0E4D8; border-radius: 9999px; }
+::-webkit-scrollbar-thumb:hover { background: #D9A441; }
+
+.wc-card {
+  background: #FFFFFF;
+  border: 1px solid #F0E4D8;
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 4px rgba(209,77,114,0.06), 0 4px 16px rgba(209,77,114,0.04);
+}
+.wc-card-hover:hover {
+  border-color: #E8738F;
+  box-shadow: 0 2px 8px rgba(209,77,114,0.1), 0 8px 24px rgba(209,77,114,0.06);
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+.float { animation: float 3s ease-in-out infinite; }
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(209,77,114,0.05) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
