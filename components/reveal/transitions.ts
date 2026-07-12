@@ -1,4 +1,4 @@
-import type { Variants, Transition } from 'framer-motion'
+import type { TargetAndTransition, Transition } from 'framer-motion'
 import type { SceneTransition } from '@/lib/types'
 
 /**
@@ -10,7 +10,12 @@ import type { SceneTransition } from '@/lib/types'
 export const SCENE_TRANSITIONS: SceneTransition[] = ['fade', 'slide-up', 'zoom-reveal', 'curtain', 'iris']
 
 interface SceneMotion {
-  variants: Variants
+  /** Plain targets passed directly as motion.div's initial/animate/exit props (not framer-motion's named-variants pattern, so deliberately not typed as `Variants` — that type also allows function resolvers, which isn't what's happening here). */
+  variants: {
+    initial: TargetAndTransition
+    animate: TargetAndTransition
+    exit: TargetAndTransition
+  }
   transition: Transition
 }
 
