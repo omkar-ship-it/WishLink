@@ -1,6 +1,7 @@
 'use client'
 import { motion } from 'framer-motion'
 import type { Scene } from '@/lib/types'
+import { SceneCaption } from './SceneCaption'
 
 interface SceneRendererProps {
   scene: Scene
@@ -12,6 +13,26 @@ interface SceneRendererProps {
 export function SceneRenderer({ scene, accentFrom, accentTo }: SceneRendererProps) {
   const bgFrom = scene.background?.from ?? accentFrom
   const bgTo   = scene.background?.to   ?? accentTo
+
+  if (scene.layout === 'video') {
+    return (
+      <div className="absolute inset-0 overflow-hidden bg-black">
+        {scene.videoUrl ? (
+          <video
+            src={scene.videoUrl}
+            autoPlay
+            muted
+            loop
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          />
+        ) : (
+          <div className="absolute inset-0" style={{ background: `linear-gradient(160deg, ${bgFrom} 0%, ${bgTo} 100%)` }} />
+        )}
+        <SceneCaption heading={scene.heading} body={scene.body} />
+      </div>
+    )
+  }
 
   if (scene.layout === 'image-only' || scene.layout === 'image-text') {
     return (
@@ -28,17 +49,7 @@ export function SceneRenderer({ scene, accentFrom, accentTo }: SceneRendererProp
         ) : (
           <div className="absolute inset-0" style={{ background: `linear-gradient(160deg, ${bgFrom} 0%, ${bgTo} 100%)` }} />
         )}
-        {(scene.heading || scene.body) && (
-          <div className="absolute inset-x-0 bottom-0 px-8 pb-16 pt-32"
-            style={{ background: 'linear-gradient(0deg, rgba(0,0,0,0.72) 0%, transparent 100%)' }}>
-            {scene.heading && (
-              <p className="font-display text-2xl font-semibold text-white leading-snug mb-1.5">{scene.heading}</p>
-            )}
-            {scene.body && (
-              <p className="text-sm text-white/80 leading-relaxed">{scene.body}</p>
-            )}
-          </div>
-        )}
+        <SceneCaption heading={scene.heading} body={scene.body} />
       </div>
     )
   }

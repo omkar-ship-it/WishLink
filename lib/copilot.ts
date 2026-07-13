@@ -23,7 +23,7 @@ export interface CopilotEntry {
   actions?: CopilotAction[]
 }
 
-const TITLE_IDEAS: Record<OccasionType, string[]> = {
+export const TITLE_IDEAS: Record<OccasionType, string[]> = {
   goodwill: ['A thank-you that matters', 'For the kindness you showed', 'You made a difference'],
   birthday: ['Another trip around the sun', 'Happy birthday, truly', "Here's to you today"],
   anniversary: ['Still choosing you', 'To many more years', 'The story keeps growing'],
@@ -32,7 +32,7 @@ const TITLE_IDEAS: Record<OccasionType, string[]> = {
   trip: ['Remember when we...', 'Our trip, together', 'The memories we made'],
 }
 
-const OPENING_LINES: Record<OccasionType, { heading: string; body: string }[]> = {
+export const OPENING_LINES: Record<OccasionType, { heading: string; body: string }[]> = {
   goodwill: [
     { heading: 'What you did mattered', body: 'It would have been easy to look away. You didn’t.' },
     { heading: 'Thank you, truly', body: 'Some acts of kindness stay with people. This is one of them.' },

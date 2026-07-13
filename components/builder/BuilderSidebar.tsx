@@ -1,28 +1,24 @@
 'use client'
 import { useState } from 'react'
-import { ChevronDown, Type, Quote, Image as ImageIcon } from 'lucide-react'
-import type { MusicTrack, OccasionType, SceneLayout } from '@/lib/types'
+import { ChevronDown } from 'lucide-react'
+import type { MusicTrack, OccasionType } from '@/lib/types'
+import { MOMENT_TYPES, MOMENT_CATEGORIES } from '@/lib/moment-types'
 import { TemplateLibrary } from './TemplateLibrary'
 import { MusicPicker } from './MusicPicker'
+import { NEW_MOMENT_PREFIX } from './BuilderCanvas'
 import { cn } from '@/lib/utils'
 
 interface BuilderSidebarProps {
   occasion: OccasionType
   onSelectOccasion: (o: OccasionType) => void
-  onAddScene: (layout: SceneLayout) => void
+  onAddMoment: (momentTypeId: string) => void
   musicTrackId: string | null
   onMusicChange: (trackId: string) => void
   musicOpen: boolean
   onMusicOpenChange: (open: boolean) => void
 }
 
-const PALETTE: { layout: SceneLayout; label: string; icon: typeof Type }[] = [
-  { layout: 'text-only', label: 'Text', icon: Type },
-  { layout: 'quote', label: 'Quote', icon: Quote },
-  { layout: 'image-text', label: 'Photo', icon: ImageIcon },
-]
-
-type Section = 'templates' | 'scenes' | 'music'
+type Section = 'templates' | 'moments' | 'music'
 
 function SidebarSection({
   id, title, open, onToggle, children,
@@ -43,9 +39,9 @@ function SidebarSection({
 }
 
 export function BuilderSidebar({
-  occasion, onSelectOccasion, onAddScene, musicTrackId, onMusicChange, musicOpen, onMusicOpenChange,
+  occasion, onSelectOccasion, onAddMoment, musicTrackId, onMusicChange, musicOpen, onMusicOpenChange,
 }: BuilderSidebarProps) {
-  const [open, setOpen] = useState<Section | null>('templates')
+  const [open, setOpen] = useState<Section | null>('moments')
 
   const toggle = (id: Section) => {
     if (id === 'music') { onMusicOpenChange(!musicOpen); return }
@@ -62,24 +58,29 @@ export function BuilderSidebar({
       </div>
 
       <div>
-        <p className="text-xs font-semibold tracking-widest uppercase text-text-3 mb-2 px-1">Build</p>
-        <SidebarSection id="scenes" title="Add a scene" open={open === 'scenes'} onToggle={toggle}>
+        <p className="text-xs font-semibold tracking-widest uppercase text-text-3 mb-2 px-1">Add a moment</p>
+        <SidebarSection id="moments" title="Moment library" open={open === 'moments'} onToggle={toggle}>
           <p className="text-xs text-text-3 mb-2.5">Drag onto the canvas, or tap to append.</p>
-          <div className="grid grid-cols-3 gap-2">
-            {PALETTE.map(({ layout, label, icon: Icon }) => (
-              <button
-                key={layout}
-                type="button"
-                draggable
-                onDragStart={e => e.dataTransfer.setData('text/plain', `new-scene:${layout}`)}
-                onClick={() => onAddScene(layout)}
-                className="flex flex-col items-center gap-1 py-3 rounded-xl bg-surface-2 text-text-2 text-xs font-semibold hover:bg-brand/10 hover:text-brand cursor-grab active:cursor-grabbing transition-colors"
-              >
-                <Icon className="w-4 h-4" />
-                {label}
-              </button>
-            ))}
-          </div>
+          {MOMENT_CATEGORIES.map(category => (
+            <div key={category} className="mb-3 last:mb-0">
+              <p className="text-[10px] font-semibold text-text-3 uppercase tracking-wide mb-1.5">{category}</p>
+              <div className="grid grid-cols-3 gap-2">
+                {MOMENT_TYPES.filter(m => m.category === category).map(({ id, label, icon: Icon }) => (
+                  <button
+                    key={id}
+                    type="button"
+                    draggable
+                    onDragStart={e => e.dataTransfer.setData('text/plain', `${NEW_MOMENT_PREFIX}${id}`)}
+                    onClick={() => onAddMoment(id)}
+                    className="flex flex-col items-center gap-1 py-3 rounded-xl bg-surface-2 text-text-2 text-xs font-semibold hover:bg-brand/10 hover:text-brand cursor-grab active:cursor-grabbing transition-colors text-center"
+                  >
+                    <Icon className="w-4 h-4" />
+                    <span className="leading-tight">{label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
         </SidebarSection>
       </div>
 

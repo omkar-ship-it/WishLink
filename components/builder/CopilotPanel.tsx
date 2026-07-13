@@ -4,7 +4,7 @@ import type { CopilotEntry } from '@/lib/copilot'
 
 export function CopilotPanel({ entries }: { entries: CopilotEntry[] }) {
   return (
-    <div className="h-full overflow-y-auto p-4">
+    <div>
       <div className="flex items-center gap-2 mb-1">
         <Sparkles className="w-4 h-4 text-brand" />
         <p className="text-sm font-semibold text-text">Co-pilot</p>

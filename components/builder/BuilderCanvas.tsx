@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { GripVertical } from 'lucide-react'
-import type { Scene, SceneLayout } from '@/lib/types'
-import { SceneCard } from './SceneCard'
+import type { Scene } from '@/lib/types'
+import { MomentCard } from './MomentCard'
 
 interface BuilderCanvasProps {
   title: string
@@ -12,22 +12,23 @@ interface BuilderCanvasProps {
   recipientName: string
   onRecipientNameChange: (v: string) => void
   scenes: Scene[]
-  onSceneChange: (id: string, patch: Partial<Scene>) => void
+  selectedSceneId: string | null
+  onSelectScene: (id: string) => void
   onSceneRemove: (id: string) => void
   onSceneMove: (id: string, direction: -1 | 1) => void
+  onSceneDuplicate: (id: string) => void
   onSceneReorder: (draggedId: string, targetId: string) => void
-  onImageSelect: (id: string, file: File) => Promise<void>
-  onDropNewScene: (layout: SceneLayout, beforeId?: string) => void
+  onDropNewMoment: (momentTypeId: string, beforeId?: string) => void
 }
 
-const NEW_SCENE_PREFIX = 'new-scene:'
+export const NEW_MOMENT_PREFIX = 'new-moment:'
 const REORDER_PREFIX = 'scene-reorder:'
 
 export function BuilderCanvas({
   title, onTitleChange,
   senderName, onSenderNameChange,
   recipientName, onRecipientNameChange,
-  scenes, onSceneChange, onSceneRemove, onSceneMove, onSceneReorder, onImageSelect, onDropNewScene,
+  scenes, selectedSceneId, onSelectScene, onSceneRemove, onSceneMove, onSceneDuplicate, onSceneReorder, onDropNewMoment,
 }: BuilderCanvasProps) {
   const [dragOverId, setDragOverId] = useState<string | null>(null)
 
@@ -35,8 +36,8 @@ export function BuilderCanvas({
     e.preventDefault()
     setDragOverId(null)
     const payload = e.dataTransfer.getData('text/plain')
-    if (payload.startsWith(NEW_SCENE_PREFIX)) {
-      onDropNewScene(payload.slice(NEW_SCENE_PREFIX.length) as SceneLayout, targetId)
+    if (payload.startsWith(NEW_MOMENT_PREFIX)) {
+      onDropNewMoment(payload.slice(NEW_MOMENT_PREFIX.length), targetId)
     } else if (payload.startsWith(REORDER_PREFIX)) {
       const draggedId = payload.slice(REORDER_PREFIX.length)
       if (draggedId !== targetId) onSceneReorder(draggedId, targetId)
@@ -68,34 +69,36 @@ export function BuilderCanvas({
         </div>
       </div>
 
-      <div className="space-y-2">
+      <div className="relative space-y-2">
+        <div className="absolute left-[11px] top-2 bottom-2 w-px border-l border-dashed border-border" aria-hidden />
         {scenes.map((scene, i) => (
           <div
             key={scene.id}
             onDragOver={e => { e.preventDefault(); setDragOverId(scene.id) }}
             onDragLeave={() => setDragOverId(prev => (prev === scene.id ? null : prev))}
             onDrop={e => handleDrop(e, scene.id)}
-            className={`rounded-2xl transition-shadow ${dragOverId === scene.id ? 'ring-2 ring-brand ring-offset-2' : ''}`}
+            className={`relative rounded-2xl transition-shadow ${dragOverId === scene.id ? 'ring-2 ring-brand ring-offset-2' : ''}`}
           >
-            <div className="flex gap-1.5 items-start">
+            <div className="flex gap-1.5 items-center">
               <button
                 type="button"
                 draggable
                 onDragStart={e => e.dataTransfer.setData('text/plain', `${REORDER_PREFIX}${scene.id}`)}
-                className="hidden sm:flex mt-4 shrink-0 w-6 h-8 rounded-md items-center justify-center text-text-3 hover:text-text-2 cursor-grab active:cursor-grabbing"
+                className="hidden sm:flex shrink-0 w-6 h-8 rounded-md items-center justify-center text-text-3 hover:text-text-2 cursor-grab active:cursor-grabbing"
                 aria-label="Drag to reorder"
               >
                 <GripVertical className="w-4 h-4" />
               </button>
               <div className="flex-1 min-w-0">
-                <SceneCard
+                <MomentCard
                   scene={scene}
                   index={i}
                   total={scenes.length}
-                  onChange={patch => onSceneChange(scene.id, patch)}
+                  selected={scene.id === selectedSceneId}
+                  onSelect={() => onSelectScene(scene.id)}
+                  onDuplicate={() => onSceneDuplicate(scene.id)}
                   onRemove={() => onSceneRemove(scene.id)}
                   onMove={dir => onSceneMove(scene.id, dir)}
-                  onImageSelect={file => onImageSelect(scene.id, file)}
                 />
               </div>
             </div>
@@ -110,13 +113,13 @@ export function BuilderCanvas({
           e.preventDefault()
           setDragOverId(null)
           const payload = e.dataTransfer.getData('text/plain')
-          if (payload.startsWith(NEW_SCENE_PREFIX)) onDropNewScene(payload.slice(NEW_SCENE_PREFIX.length) as SceneLayout)
+          if (payload.startsWith(NEW_MOMENT_PREFIX)) onDropNewMoment(payload.slice(NEW_MOMENT_PREFIX.length))
         }}
         className={`h-16 rounded-2xl border-2 border-dashed flex items-center justify-center text-xs font-medium mt-2 transition-colors ${
           dragOverId === '__end__' ? 'border-brand text-brand bg-brand/5' : 'border-border/60 text-text-3'
         }`}
       >
-        Drag a scene here, or use the palette on the left
+        Drag a moment here, or use the palette on the left
       </div>
     </div>
   )

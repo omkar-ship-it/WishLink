@@ -6,22 +6,30 @@ import { saveCard } from '@/lib/mock-store'
 import { getTemplate } from '@/lib/templates'
 import { OCCASION_META } from '@/lib/occasions'
 import { getCopilotFeed } from '@/lib/copilot'
-import type { Scene, SceneLayout, OccasionType, PrivacyMode } from '@/lib/types'
+import { MOMENT_TYPES } from '@/lib/moment-types'
+import type { DraftResult } from '@/lib/copilot-draft'
+import type { Scene, OccasionType, PrivacyMode } from '@/lib/types'
 import { BuilderHeader } from './BuilderHeader'
 import { BuilderSidebar } from './BuilderSidebar'
 import { BuilderCanvas } from './BuilderCanvas'
 import { CopilotPanel } from './CopilotPanel'
+import { MomentDetails } from './MomentDetails'
+import { MomentPreviewPhone } from './MomentPreviewPhone'
+import { CreateStep } from './CreateStep'
 import { PrivacySettingsModal } from './PrivacySettingsModal'
 import { RevealPlayer } from '@/components/reveal/RevealPlayer'
+import { cn } from '@/lib/utils'
 
 interface BuilderShellProps {
   initialOccasion: OccasionType
 }
 
-function newScene(layout: SceneLayout, accentFrom: string, accentTo: string): Scene {
+function newSceneFromMomentType(momentTypeId: string, accentFrom: string, accentTo: string): Scene {
+  const momentType = MOMENT_TYPES.find(m => m.id === momentTypeId) ?? MOMENT_TYPES[0]
   return {
     id: crypto.randomUUID(),
-    layout,
+    layout: momentType.layout,
+    interaction: momentType.interaction,
     transition: 'fade',
     durationMs: 4000,
     heading: '',
@@ -30,8 +38,12 @@ function newScene(layout: SceneLayout, accentFrom: string, accentTo: string): Sc
   }
 }
 
+const sceneFingerprint = (scenes: Scene[]) =>
+  JSON.stringify(scenes.map(s => ({ layout: s.layout, heading: s.heading, body: s.body, imageUrl: s.imageUrl })))
+
 export function BuilderShell({ initialOccasion }: BuilderShellProps) {
   const router = useRouter()
+  const [step, setStep] = useState<'create' | 'edit'>('create')
   const [occasion, setOccasion] = useState<OccasionType>(initialOccasion)
   const meta = OCCASION_META[occasion]
   const template = getTemplate(occasion)
@@ -52,6 +64,10 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
   const [error, setError] = useState<string | null>(null)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [selectedSceneId, setSelectedSceneId] = useState<string | null>(null)
+  const [rightTab, setRightTab] = useState<'details' | 'preview'>('details')
+
+  const selectedScene = scenes.find(s => s.id === selectedSceneId)
 
   const updateScene = (id: string, patch: Partial<Scene>) =>
     setScenes(prev => prev.map(s => (s.id === id ? { ...s, ...patch } : s)))
@@ -69,6 +85,16 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
       return next
     })
 
+  const duplicateScene = (id: string) =>
+    setScenes(prev => {
+      const idx = prev.findIndex(s => s.id === id)
+      if (idx === -1) return prev
+      const clone: Scene = { ...prev[idx], id: crypto.randomUUID() }
+      const next = [...prev]
+      next.splice(idx + 1, 0, clone)
+      return next
+    })
+
   const reorderScenes = (draggedId: string, targetId: string) =>
     setScenes(prev => {
       const from = prev.findIndex(s => s.id === draggedId)
@@ -80,12 +106,12 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
       return next
     })
 
-  const addScene = (layout: SceneLayout) =>
-    setScenes(prev => [...prev, newScene(layout, meta.accentFrom, meta.accentTo)])
+  const addMoment = (momentTypeId: string) =>
+    setScenes(prev => [...prev, newSceneFromMomentType(momentTypeId, meta.accentFrom, meta.accentTo)])
 
-  const dropNewScene = (layout: SceneLayout, beforeId?: string) =>
+  const dropNewMoment = (momentTypeId: string, beforeId?: string) =>
     setScenes(prev => {
-      const scene = newScene(layout, meta.accentFrom, meta.accentTo)
+      const scene = newSceneFromMomentType(momentTypeId, meta.accentFrom, meta.accentTo)
       if (!beforeId) return [...prev, scene]
       const idx = prev.findIndex(s => s.id === beforeId)
       if (idx === -1) return [...prev, scene]
@@ -96,6 +122,11 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
 
   const handleSelectOccasion = (next: OccasionType) => {
     if (next === occasion) return
+    const isTemplateFresh = scenes.every(s => !s.interaction || s.interaction === 'auto') && sceneFingerprint(scenes) === sceneFingerprint(template.scenes)
+    if (!isTemplateFresh && step === 'edit') {
+      const proceed = window.confirm('Switching templates will replace your drafted moments — continue?')
+      if (!proceed) return
+    }
     const nextTemplate = getTemplate(next)
     setOccasion(next)
     setScenes(nextTemplate.scenes.map(s => ({ ...s, id: crypto.randomUUID() })))
@@ -103,14 +134,35 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
     if (title === template.name) setTitle(nextTemplate.name)
   }
 
+  const readAsDataUrl = (file: File) => new Promise<string>((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result as string)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+
   const handleImageSelect = async (sceneId: string, file: File) => {
-    const dataUrl = await new Promise<string>((resolve, reject) => {
-      const reader = new FileReader()
-      reader.onload = () => resolve(reader.result as string)
-      reader.onerror = reject
-      reader.readAsDataURL(file)
-    })
+    const dataUrl = await readAsDataUrl(file)
     updateScene(sceneId, { imageUrl: dataUrl })
+  }
+
+  const handleMultiImageSelect = async (sceneId: string, files: File[]) => {
+    const dataUrls = await Promise.all(files.map(readAsDataUrl))
+    setScenes(prev => prev.map(s => (s.id === sceneId ? { ...s, imageUrls: [...(s.imageUrls ?? []), ...dataUrls] } : s)))
+  }
+
+  const handleVideoSelect = async (sceneId: string, file: File) => {
+    const dataUrl = await readAsDataUrl(file)
+    updateScene(sceneId, { videoUrl: dataUrl })
+  }
+
+  const handleDraft = (result: DraftResult, draftedRecipientName: string) => {
+    setTitle(result.title)
+    setScenes(result.scenes)
+    setMusicTrackId(result.musicTrackId)
+    if (draftedRecipientName) setRecipientName(draftedRecipientName)
+    setSelectedSceneId(result.scenes[0]?.id ?? null)
+    setStep('edit')
   }
 
   const copilotEntries = useMemo(() => getCopilotFeed(
@@ -126,7 +178,7 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
     },
     {
       setTitle,
-      addScene,
+      addScene: layout => addMoment(MOMENT_TYPES.find(m => m.layout === layout)?.id ?? MOMENT_TYPES[0].id),
       patchScene: updateScene,
       openMusic: () => setMusicOpen(true),
       openPrivacy: () => setPrivacyOpen(true),
@@ -231,6 +283,7 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
       <BuilderHeader
         meta={meta}
         title={title}
+        step={step}
         onOpenPrivacy={() => setPrivacyOpen(true)}
         onPreview={() => setPreviewOpen(true)}
         onPublish={handlePublish}
@@ -239,41 +292,80 @@ export function BuilderShell({ initialOccasion }: BuilderShellProps) {
 
       {error && <p className="text-sm text-danger px-4 pt-3">{error}</p>}
 
-      <div className="flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr_300px] min-h-0">
-        <div className="hidden lg:block border-r border-border min-h-0">
-          <BuilderSidebar
-            occasion={occasion}
-            onSelectOccasion={handleSelectOccasion}
-            onAddScene={addScene}
-            musicTrackId={musicTrackId}
-            onMusicChange={setMusicTrackId}
-            musicOpen={musicOpen}
-            onMusicOpenChange={setMusicOpen}
-          />
-        </div>
+      {step === 'create' ? (
+        <CreateStep occasion={occasion} onSelectOccasion={handleSelectOccasion} onDraft={handleDraft} />
+      ) : (
+        <div className="flex-1 grid grid-cols-1 lg:grid-cols-[280px_1fr_320px] min-h-0">
+          <div className="hidden lg:block border-r border-border min-h-0">
+            <BuilderSidebar
+              occasion={occasion}
+              onSelectOccasion={handleSelectOccasion}
+              onAddMoment={addMoment}
+              musicTrackId={musicTrackId}
+              onMusicChange={setMusicTrackId}
+              musicOpen={musicOpen}
+              onMusicOpenChange={setMusicOpen}
+            />
+          </div>
 
-        <div className="min-h-0 overflow-y-auto">
-          <BuilderCanvas
-            title={title}
-            onTitleChange={setTitle}
-            senderName={senderName}
-            onSenderNameChange={setSenderName}
-            recipientName={recipientName}
-            onRecipientNameChange={setRecipientName}
-            scenes={scenes}
-            onSceneChange={updateScene}
-            onSceneRemove={removeScene}
-            onSceneMove={moveScene}
-            onSceneReorder={reorderScenes}
-            onImageSelect={handleImageSelect}
-            onDropNewScene={dropNewScene}
-          />
-        </div>
+          <div className="min-h-0 overflow-y-auto">
+            <BuilderCanvas
+              title={title}
+              onTitleChange={setTitle}
+              senderName={senderName}
+              onSenderNameChange={setSenderName}
+              recipientName={recipientName}
+              onRecipientNameChange={setRecipientName}
+              scenes={scenes}
+              selectedSceneId={selectedSceneId}
+              onSelectScene={setSelectedSceneId}
+              onSceneRemove={removeScene}
+              onSceneMove={moveScene}
+              onSceneDuplicate={duplicateScene}
+              onSceneReorder={reorderScenes}
+              onDropNewMoment={dropNewMoment}
+            />
+          </div>
 
-        <div className="hidden lg:block border-l border-border min-h-0">
-          <CopilotPanel entries={copilotEntries} />
+          <div className="hidden lg:flex flex-col border-l border-border min-h-0">
+            <div className="flex border-b border-border shrink-0">
+              {(['details', 'preview'] as const).map(tab => (
+                <button
+                  key={tab}
+                  onClick={() => setRightTab(tab)}
+                  className={cn(
+                    'flex-1 py-2.5 text-xs font-semibold capitalize transition-colors',
+                    rightTab === tab ? 'text-brand border-b-2 border-brand' : 'text-text-3',
+                  )}
+                >
+                  {tab}
+                </button>
+              ))}
+            </div>
+            <div className="flex-1 overflow-y-auto">
+              {rightTab === 'preview' ? (
+                <MomentPreviewPhone scene={selectedScene ?? scenes[0]} accentFrom={meta.accentFrom} accentTo={meta.accentTo} />
+              ) : (
+                <div className="p-4 space-y-3">
+                  {selectedScene && (
+                    <MomentDetails
+                      scene={selectedScene}
+                      accentFrom={meta.accentFrom}
+                      accentTo={meta.accentTo}
+                      onChange={patch => updateScene(selectedScene.id, patch)}
+                      onClose={() => setSelectedSceneId(null)}
+                      onImageSelect={file => handleImageSelect(selectedScene.id, file)}
+                      onMultiImageSelect={files => handleMultiImageSelect(selectedScene.id, files)}
+                      onVideoSelect={file => handleVideoSelect(selectedScene.id, file)}
+                    />
+                  )}
+                  <CopilotPanel entries={copilotEntries} />
+                </div>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }
