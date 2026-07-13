@@ -71,6 +71,8 @@ export interface Card {
   musicTrackId: string | null
   privacyMode: PrivacyMode
   recipientEmail?: string | null
+  /** Independent lock, combinable with either privacyMode — set to require a shared passcode before reveal. */
+  passcode?: string
   shareSlug: string
   viewCount: number
   createdAt: string

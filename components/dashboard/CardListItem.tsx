@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { Copy, Check, Eye, Lock, Globe } from 'lucide-react'
+import { Copy, Check, Eye, Lock, Globe, KeyRound } from 'lucide-react'
 import { OCCASION_META } from '@/lib/occasions'
 import { OccasionBadge } from '@/components/art/OccasionBadge'
 import { formatDate } from '@/lib/utils'
@@ -33,6 +33,14 @@ export function CardListItem({ card }: { card: Card }) {
             {card.privacyMode === 'email_gated' ? <Lock className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
             {card.privacyMode === 'email_gated' ? 'Private' : 'Anyone with link'}
           </span>
+          {card.passcode && (
+            <>
+              <span>·</span>
+              <span className="inline-flex items-center gap-1">
+                <KeyRound className="w-3 h-3" /> Passcode
+              </span>
+            </>
+          )}
         </div>
       </div>
       <button
