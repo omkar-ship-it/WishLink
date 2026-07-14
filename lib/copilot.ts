@@ -132,3 +132,90 @@ export function getCopilotFeed(
 
   return entries
 }
+
+/** Free-text chat resolver for the AI Assistant panel — deliberately simple keyword matching,
+ * not a real model call, but wired to the same live handlers as the suggestion feed above so
+ * every reply's action button does something real. */
+export function getCopilotReply(
+  message: string,
+  snapshot: BuilderSnapshot,
+  handlers: {
+    addScene: (layout: SceneLayout) => void
+    patchScene: (id: string, patch: Partial<Scene>) => void
+    trimStory: () => void
+    openMusic: () => void
+    openPrivacy: () => void
+  },
+): CopilotEntry {
+  const m = message.toLowerCase()
+  const id = () => crypto.randomUUID()
+
+  if (/short|trim|tighten|too long/.test(m)) {
+    return {
+      id: id(),
+      text: 'I can tighten the pacing — this trims every scene toward the punchier end of its range.',
+      actions: [{ id: 'trim', label: 'Shorten the story', run: handlers.trimStory }],
+    }
+  }
+
+  if (/heartfelt|emotional|warm|feel|letter/.test(m)) {
+    const emptyScene = snapshot.scenes.find(s => s.layout !== 'image-only' && !s.heading?.trim() && !s.body?.trim())
+    const line = OPENING_LINES[snapshot.occasion][0]
+    if (emptyScene) {
+      return {
+        id: id(),
+        text: 'Here’s a heartfelt line for the blank scene you’ve got — want me to drop it in?',
+        actions: [{ id: 'line', label: `Use "${line.heading}"`, run: () => handlers.patchScene(emptyScene.id, { heading: line.heading, body: line.body }) }],
+      }
+    }
+    return {
+      id: id(),
+      text: 'Every scene already has words — a short quote moment right before the ending adds one more emotional beat.',
+      actions: [{ id: 'quote', label: 'Add a quote moment', run: () => handlers.addScene('quote') }],
+    }
+  }
+
+  if (/photo|picture|image|gallery/.test(m)) {
+    return {
+      id: id(),
+      text: 'A photo moment lands well right before the ending — want one added?',
+      actions: [{ id: 'photo', label: 'Add a photo moment', run: () => handlers.addScene('image-text') }],
+    }
+  }
+
+  if (/surprise|idea|gift/.test(m)) {
+    return {
+      id: id(),
+      text: 'A gift-reveal closer — drag to unwrap — almost always lands well as the last beat.',
+      actions: [{ id: 'gift', label: 'Add a gift reveal', run: () => handlers.addScene('image-only') }],
+    }
+  }
+
+  if (/music|song|sound|audio/.test(m)) {
+    return {
+      id: id(),
+      text: 'Music underneath makes the reveal feel a lot more personal — want to pick a track?',
+      actions: [{ id: 'music', label: 'Pick a track', run: handlers.openMusic }],
+    }
+  }
+
+  if (/private|lock|passcode|only .*(see|open)/.test(m)) {
+    return {
+      id: id(),
+      text: 'You can lock this to just the recipient — an email gate, a passcode, or both.',
+      actions: [{ id: 'privacy', label: 'Set up privacy', run: handlers.openPrivacy }],
+    }
+  }
+
+  if (/vintage|theme|colou?r|style|palette/.test(m)) {
+    return {
+      id: id(),
+      text: 'This prototype doesn’t retheme the whole card yet — but each moment’s Timing menu on the canvas has its own background swatches you can restyle individually.',
+    }
+  }
+
+  return {
+    id: id(),
+    text: 'Noted. Try asking me to shorten the story, add a photo, suggest a surprise, or pick music — I can act on any of those directly.',
+  }
+}
