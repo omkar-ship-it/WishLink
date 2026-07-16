@@ -255,16 +255,7 @@
   .pc-lines span { display: block; height: 1px; background: var(--paper-shadow); opacity: 0.7; }
   .pc-lines span:first-child { width: 70%; }
 
-  .deck-controls { display: flex; align-items: center; gap: 1.4rem; margin-top: 1.6rem; }
-  .deck-nav {
-    width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(236,223,192,0.35);
-    background: none; color: #ecdfc0; display: flex; align-items: center; justify-content: center;
-    transition: background 0.25s, opacity 0.25s;
-  }
-  .deck-nav:hover { background: rgba(236,223,192,0.1); }
-  .deck-nav:disabled { opacity: 0.3; pointer-events: none; }
-  .deck-nav svg { width: 16px; height: 16px; }
-  .deck-hint { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8a7f63; margin-top: 1rem; opacity: 0.8; }
+  .deck-hint { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8a7f63; margin-top: 2.2rem; opacity: 0.8; }
 
   /* ---------- outro: cards gather back into the envelope ---------- */
   .outro {
@@ -355,15 +346,7 @@
 <div class="deck-scene" id="deckScene">
   <div class="stack-pile" id="stackPile"></div>
   <div class="postcard-stage" id="stage"></div>
-  <div class="deck-controls">
-    <button class="deck-nav" id="prevBtn" aria-label="Previous">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
-    </button>
-    <button class="deck-nav" id="nextBtn" aria-label="Next">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
-    </button>
-  </div>
-  <p class="deck-hint">tap, swipe, or use the arrows</p>
+  <p class="deck-hint">tap or swipe to continue</p>
 </div>
 
 <div class="outro" id="outro">
@@ -577,8 +560,6 @@
 
   var stage = document.getElementById("stage");
   var stackPile = document.getElementById("stackPile");
-  var prevBtn = document.getElementById("prevBtn");
-  var nextBtn = document.getElementById("nextBtn");
   var current = 0;
 
   function cardHTML(i) {
@@ -619,11 +600,6 @@
     stage.appendChild(front);
     if (cards.length > 1) stage.appendChild(makeCardEl(1, "slot-peek1"));
     if (cards.length > 2) stage.appendChild(makeCardEl(2, "slot-peek2"));
-    updateControls();
-  }
-
-  function updateControls() {
-    prevBtn.disabled = current === 0;
   }
 
   function goNext() {
@@ -655,7 +631,6 @@
         });
       });
     }
-    updateControls();
   }
 
   function goPrev() {
@@ -680,11 +655,7 @@
         el.classList.add("slot-front");
       });
     });
-    updateControls();
   }
-
-  nextBtn.addEventListener("click", goNext);
-  prevBtn.addEventListener("click", goPrev);
 
   var touchStartX = null;
   stage.addEventListener("touchstart", function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
