@@ -612,7 +612,11 @@
     letter-spacing: 0.08em;
     padding: 0.65rem 1.4rem;
     border-radius: 2px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.9s ease, background 0.3s;
   }
+  .reseal-btn.ready { opacity: 1; pointer-events: auto; }
   .reseal-btn:hover { background: rgba(44,43,61,0.06); }
 
   /* ---------- resealed outro overlay ---------- */
@@ -731,8 +735,6 @@
       <p class="cap">morning coffee, slightly burnt</p>
     </div>
 
-    <div class="tucked-note reveal" style="--r:5deg"><span class="pin"></span><p>"I have never once been bored next to you. That is not a small thing."</p></div>
-
     <p class="prose soft reveal">Some of what I remember doesn't photograph well — the long drive nowhere we took on a Sunday, lost on purpose; the balcony in the rain with no umbrella, because you said the rain smelled like beginnings and I believed you; the 2 a.m. conversations about nothing, and everything, that always started too late and ended too soon.</p>
 
     <div class="photo-strip reveal">
@@ -755,6 +757,8 @@
     </div>
 
     <div class="tucked-note reveal" style="--r:-3deg"><span class="pin"></span><p>"Home stopped being a place the day you became it."</p></div>
+
+    <p class="prose soft reveal">I won't pretend every year of this was easy — there were stretches where we were just tired, or distracted, or bad at saying the right thing to each other at the right time. I don't want to skip past that part like it didn't happen. It did. And somehow we kept choosing this anyway.</p>
 
     <p class="prose reveal">This is the part I'm bad at saying out loud, so I'm writing it instead: thank you. For staying easy to love on the hard days. For the version of patience only you seem to have. For choosing this — choosing us — five years running.</p>
 
@@ -905,6 +909,36 @@
     playNote(1108.7, audioCtx.currentTime + 0.12, 1.5, 0.06);
   }
 
+  function crack() {
+    if (!audioCtx) return;
+    var now = audioCtx.currentTime;
+    var bufferSize = Math.floor(audioCtx.sampleRate * 0.12);
+    var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+    }
+    var noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+    var filter = audioCtx.createBiquadFilter();
+    filter.type = "bandpass";
+    filter.frequency.value = 2400;
+    filter.Q.value = 1.2;
+    var g = audioCtx.createGain();
+    g.gain.value = 0.22;
+    noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination);
+    noise.start(now);
+
+    var thud = audioCtx.createOscillator();
+    thud.type = "sine";
+    thud.frequency.value = 90;
+    var tg = audioCtx.createGain();
+    tg.gain.setValueAtTime(0.15, now);
+    tg.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+    thud.connect(tg); tg.connect(audioCtx.destination);
+    thud.start(now); thud.stop(now + 0.15);
+  }
+
   /* ---------------- envelope gate ---------------- */
   var gate = document.getElementById("gate");
   var envFlap = document.getElementById("envFlap");
@@ -918,6 +952,7 @@
     opened = true;
     startMusic();
     updateSoundIcon();
+    crack();
     breakSealBtn.disabled = true;
     sealWrap.classList.add("cracked");
     gate.classList.add("opening");
@@ -1063,6 +1098,9 @@
     peakBlock.classList.add("done");
     holdRow.classList.add("done");
     chime();
+    setTimeout(function () {
+      if (resealBtn) resealBtn.classList.add("ready");
+    }, reduced ? 200 : 2600);
   }
 
   function beginHold(e) {
