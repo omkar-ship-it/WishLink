@@ -446,7 +446,13 @@
     box-shadow: 0 12px 26px rgba(43,36,32,0.3), 0 1px 0 rgba(255,255,255,0.5) inset;
     transform: rotate(var(--r, -2deg));
   }
-  .photo-corner .art { width: 100%; aspect-ratio: 4/3; }
+  .photo-corner .art {
+    width: 100%;
+    aspect-ratio: 4/3;
+    object-fit: cover;
+    display: block;
+    filter: sepia(0.32) saturate(1.05) contrast(1.02) brightness(0.98);
+  }
   .photo-corner .cap {
     font-family: var(--font-type);
     font-size: 0.62rem;
@@ -592,6 +598,8 @@
   .signoff { font-size: var(--fs-salut); color: var(--ink); margin: 3.5rem 0 0.3rem; text-align: center; }
   .signature { font-size: 1.6rem; color: var(--seal); text-align: center; margin: 0 0 3rem; }
   .footer-note { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.08em; color: var(--ink-faint); text-align: center; margin-bottom: 2.4rem; }
+  .photo-credits { font-family: var(--font-type); font-size: 0.52rem; letter-spacing: 0.03em; color: var(--ink-faint); text-align: center; opacity: 0.55; margin: 0 0 2.4rem; line-height: 1.6; }
+  .photo-credits a { color: inherit; }
 
   .reseal-btn {
     display: block;
@@ -719,7 +727,7 @@
     <p class="prose reveal">I don't remember the first time "Chinni" slipped out — somewhere between a bad joke and a good one, your name softened into something only I get to say. Five years later, it still does the same thing it did the very first time: makes the room feel like ours, no matter which room we're in.</p>
 
     <div class="photo-corner reveal" style="--r:3deg">
-      <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(225,168,74,0.55), transparent 60%), radial-gradient(circle at 75% 70%, rgba(80,60,30,0.7), transparent 65%), linear-gradient(40deg, rgba(225,168,74,0.25), rgba(80,60,30,0.85));"></div>
+      <img class="art" src="/lab/images/coffee.jpg" alt="Steam rising from a mug of coffee in morning light" loading="lazy" />
       <p class="cap">morning coffee, slightly burnt</p>
     </div>
 
@@ -729,19 +737,19 @@
 
     <div class="photo-strip reveal">
       <div class="photo-corner" style="--r:-3deg">
-        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(126,160,132,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(30,25,45,0.75), transparent 65%), linear-gradient(120deg, rgba(126,160,132,0.2), rgba(30,25,45,0.9));"></div>
+        <img class="art" src="/lab/images/road.jpg" alt="A winding road through golden hills at sunset" loading="lazy" />
         <p class="cap">the long drive nowhere</p>
       </div>
       <div class="photo-corner" style="--r:2deg">
-        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(98,110,180,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(40,30,60,0.8), transparent 65%), linear-gradient(200deg, rgba(98,110,180,0.25), rgba(40,30,60,0.9));"></div>
+        <img class="art" src="/lab/images/rain.jpg" alt="Raindrops on a window pane" loading="lazy" />
         <p class="cap">monsoon, no umbrella</p>
       </div>
       <div class="photo-corner" style="--r:4deg">
-        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(226,137,106,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(30,20,50,0.8), transparent 65%), linear-gradient(300deg, rgba(226,137,106,0.25), rgba(30,20,50,0.9));"></div>
+        <img class="art" src="/lab/images/night.jpg" alt="Warm string lights glowing along a garden path at night" loading="lazy" />
         <p class="cap">2 a.m., still laughing</p>
       </div>
       <div class="photo-corner" style="--r:-2deg">
-        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(240,168,58,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(40,20,50,0.8), transparent 65%), linear-gradient(160deg, rgba(240,168,58,0.25), rgba(40,20,50,0.9));"></div>
+        <img class="art" src="/lab/images/candle.jpg" alt="A single candle flame glowing in the dark" loading="lazy" />
         <p class="cap">five first anniversaries</p>
       </div>
     </div>
@@ -781,6 +789,13 @@
     <p class="footer-note reveal">written on a quiet evening · 16 July 2026</p>
 
     <button class="reseal-btn" id="resealBtn">fold and seal the letter</button>
+
+    <p class="photo-credits">
+      photos via Wikimedia Commons —
+      rain: Joshua Sampson (CC BY 3.0) ·
+      string lights: PattayaPatrol (CC BY-SA 4.0) ·
+      candle: domdomegg (CC BY 4.0)
+    </p>
   </main>
 </div>
 
