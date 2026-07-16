@@ -270,9 +270,10 @@
   .peak-hold-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: opacity 0.5s ease; }
   .peak-hold-wrap.done { opacity: 0; pointer-events: none; height: 0; overflow: hidden; margin: 0; }
   .peak-hold-btn {
-    width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid var(--ink-faint);
-    background: var(--paper); position: relative; touch-action: none;
+    width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid var(--seal);
+    background: var(--paper-2); position: relative; touch-action: none;
     -webkit-user-select: none; user-select: none; display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
   }
   .peak-hold-ring {
     position: absolute; inset: -1.5px; border-radius: 50%;
@@ -397,14 +398,13 @@
         <p class="sub">wherever this reaches you<br>by hand · if possible</p>
       </div>
     </div>
-    <div class="env-flap paper-fiber" id="envFlap">
-      <div class="env-seal-wrap" id="sealWrap" role="button" tabindex="0" aria-label="Break the wax seal and open the letter">
-        <span class="seal-glow"></span>
-        <span class="seal-legs"><span></span><span></span></span>
-        <span class="seal-half l"></span>
-        <span class="seal-half r"></span>
-        <span class="env-seal-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-9C.7 8.1 2.6 4 6.5 4c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.9 0 5.8 4.1 4 8-2.5 4.65-9.5 9-9.5 9z"/></svg></span>
-      </div>
+    <div class="env-flap paper-fiber" id="envFlap"></div>
+    <div class="env-seal-wrap" id="sealWrap" role="button" tabindex="0" aria-label="Break the wax seal and open the letter">
+      <span class="seal-glow"></span>
+      <span class="seal-legs"><span></span><span></span></span>
+      <span class="seal-half l"></span>
+      <span class="seal-half r"></span>
+      <span class="env-seal-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-9C.7 8.1 2.6 4 6.5 4c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.9 0 5.8 4.1 4 8-2.5 4.65-9.5 9-9.5 9z"/></svg></span>
     </div>
   </div>
   <button class="gate-btn" id="breakSeal">break the seal</button>
