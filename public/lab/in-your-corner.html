@@ -251,13 +251,9 @@
     mask-image: radial-gradient(circle 1.8px at 3px 3px, transparent 1.6px, #000 1.8px);
     mask-size: 5.5px 5.5px; mask-repeat: round;
   }
-  .pc-lines { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.1rem; }
+  .pc-lines { display: flex; flex-direction: column; gap: 0.35rem; margin-top: auto; }
   .pc-lines span { display: block; height: 1px; background: var(--paper-shadow); opacity: 0.7; }
   .pc-lines span:first-child { width: 70%; }
-  .pc-addr {
-    font-family: var(--font-type); font-size: 0.58rem; letter-spacing: 0.06em;
-    color: var(--ink-faint); margin-top: auto;
-  }
 
   .deck-controls { display: flex; align-items: center; gap: 1.4rem; margin-top: 1.6rem; }
   .deck-nav {
@@ -268,7 +264,6 @@
   .deck-nav:hover { background: rgba(236,223,192,0.1); }
   .deck-nav:disabled { opacity: 0.3; pointer-events: none; }
   .deck-nav svg { width: 16px; height: 16px; }
-  .deck-progress { font-family: var(--font-type); font-size: 0.68rem; letter-spacing: 0.14em; color: #c9b98a; min-width: 4.5em; text-align: center; }
   .deck-hint { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8a7f63; margin-top: 1rem; opacity: 0.8; }
 
   /* ---------- outro: cards gather back into the envelope ---------- */
@@ -364,7 +359,6 @@
     <button class="deck-nav" id="prevBtn" aria-label="Previous">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
     </button>
-    <p class="deck-progress" id="progress">1 / 6</p>
     <button class="deck-nav" id="nextBtn" aria-label="Next">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
     </button>
@@ -585,7 +579,6 @@
   var stackPile = document.getElementById("stackPile");
   var prevBtn = document.getElementById("prevBtn");
   var nextBtn = document.getElementById("nextBtn");
-  var progress = document.getElementById("progress");
   var current = 0;
 
   function cardHTML(i) {
@@ -597,7 +590,6 @@
         '<div class="pc-stamp"></div>' +
         '<div class="pc-badge">' + c.icon + '</div>' +
         '<div class="pc-lines"><span></span><span></span></div>' +
-        '<p class="pc-addr">' + (i + 1) + ' / ' + cards.length + '</p>' +
       '</div>';
   }
 
@@ -632,7 +624,6 @@
 
   function updateControls() {
     prevBtn.disabled = current === 0;
-    progress.textContent = (current + 1) + " / " + cards.length;
   }
 
   function goNext() {
