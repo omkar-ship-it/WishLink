@@ -106,7 +106,7 @@
   }
 
   .env-stamp {
-    position: absolute; top: 10%; right: 9%; width: 50px; height: 60px;
+    position: absolute; top: 10%; right: 9%; width: 58px; height: 64px;
     background: linear-gradient(160deg, var(--paper-2), var(--paper-3));
     box-shadow: 0 0 0 1px var(--paper-shadow) inset, 0 2px 4px rgba(0,0,0,0.2);
     -webkit-mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
@@ -116,10 +116,10 @@
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;
   }
   .env-stamp .stamp-label {
-    font-family: var(--font-type); font-size: 0.38rem; letter-spacing: 0.06em;
-    color: var(--postmark); text-align: center; line-height: 1.2;
+    font-family: var(--font-type); font-size: 0.48rem; letter-spacing: 0.04em;
+    color: var(--postmark); text-align: center; line-height: 1.3;
   }
-  .env-stamp .stamp-value { font-family: var(--font-type); font-size: 0.95rem; color: var(--seal); }
+  .env-stamp .stamp-value { font-family: var(--font-type); font-size: 1.1rem; color: var(--seal); }
 
   .env-flap {
     position: absolute; inset: 0;
@@ -251,7 +251,7 @@
   .postcard.gather-in-anim { animation: gatherIn 0.72s cubic-bezier(.3,.6,.3,1) forwards; z-index: 6; pointer-events: none; }
 
   /* ---------- the belief card: bare stage, hold to reveal ---------- */
-  .pc-message-peak { flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1.1rem; }
+  .pc-message-peak { flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; gap: 1.1rem; }
   .peak-hold-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: opacity 0.5s ease; }
   .peak-hold-wrap.done { opacity: 0; pointer-events: none; height: 0; overflow: hidden; margin: 0; }
   .peak-hold-btn {
@@ -273,8 +273,8 @@
   .peak-text.shown .peak-reveal-wrap { clip-path: inset(0 0% 0 0); }
 
   .pc-message {
-    flex: 1.35; padding: 1.6rem 1.3rem; display: flex; align-items: center;
-    font-size: clamp(1rem, 3.4vw, 1.24rem); color: var(--ink);
+    flex: 1.35; padding: 1.6rem 1.3rem; display: flex; align-items: flex-start;
+    font-size: clamp(0.92rem, 3vw, 1.1rem); color: var(--ink); overflow: hidden;
   }
   .pc-divider { width: 1px; background: repeating-linear-gradient(180deg, var(--paper-shadow) 0 6px, transparent 6px 11px); margin: 1rem 0; }
   .pc-right { flex: 1; padding: 0.85rem 0.85rem 0.7rem; display: flex; flex-direction: column; gap: 0.45rem; position: relative; }
@@ -567,7 +567,7 @@
     {
       img: "/lab/images/postcards/hope.jpg",
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="4"/><path d="M4 17c0-2 2-3 4-3h8c2 0 4 1 4 3"/></svg>',
-      text: "Hey. I won't pretend to know exactly what this stretch has felt like from where you're standing. I just know it's been heavy — and I didn't want another week to pass without you hearing this straight from me."
+      text: "Hey. I won't pretend to know what this has felt like from where you're standing. I just know it's been heavy — and I didn't want another week to pass without you hearing this from me."
     },
     {
       img: "/lab/images/postcards/road.jpg",
