@@ -1,0 +1,728 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>In Your Corner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --desk: #241d18;
+    --desk-2: #17110d;
+    --paper: #ecdfc0;
+    --paper-2: #e2d1a4;
+    --paper-3: #d8c491;
+    --paper-shadow: #b9a877;
+    --ink: #2c2b3d;
+    --ink-soft: #57536d;
+    --ink-faint: #78748f;
+    --seal: #7a1f2b;
+    --seal-light: #9c3040;
+    --seal-dark: #5c1620;
+    --postmark: #3c5245;
+    --gold: #a3803a;
+    --airmail-red: #9c3030;
+    --airmail-blue: #2f4a66;
+    --accent: #8a6a3c;
+
+    --font-hand: 'Kalam', cursive;
+    --font-type: 'Special Elite', monospace;
+    color-scheme: light;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: var(--desk); color: var(--ink); }
+  body { font-family: var(--font-hand); line-height: 1.6; overflow-x: hidden; }
+  body.locked { overflow: hidden; height: 100vh; }
+  button { font-family: inherit; cursor: pointer; }
+  ::selection { background: var(--seal-light); color: var(--paper); }
+  button:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+
+  .desk-grain {
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    opacity: 0.5; mix-blend-mode: overlay;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.06), transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  .paper-fiber {
+    background-image:
+      repeating-linear-gradient(90deg, rgba(120,90,40,0.025) 0px, transparent 1px, transparent 3px),
+      repeating-linear-gradient(0deg, rgba(120,90,40,0.02) 0px, transparent 1px, transparent 4px),
+      radial-gradient(circle at 15% 20%, rgba(120,90,40,0.07), transparent 10%),
+      radial-gradient(circle at 85% 65%, rgba(120,90,40,0.06), transparent 11%),
+      radial-gradient(circle at 40% 85%, rgba(120,90,40,0.05), transparent 9%);
+  }
+
+  .sound-toggle {
+    position: fixed; top: 1.2rem; right: 1.2rem; z-index: 60;
+    width: 40px; height: 40px; border-radius: 50%;
+    background: var(--paper); border: 1px solid var(--paper-shadow);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center;
+    color: var(--ink-soft); opacity: 0; transform: translateY(-6px);
+    transition: opacity 0.5s ease, transform 0.5s ease, color 0.2s;
+  }
+  .sound-toggle.shown { opacity: 1; transform: translateY(0); }
+  .sound-toggle:hover { color: var(--seal); }
+  .sound-toggle svg { width: 17px; height: 17px; }
+
+  /* ================= GATE / ENVELOPE ================= */
+  .gate {
+    position: fixed; inset: 0; z-index: 50;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 1.6rem; padding: 4.5rem 1rem 2rem;
+    background: radial-gradient(ellipse at 50% 38%, var(--desk) 0%, var(--desk-2) 100%);
+    transition: opacity 1s ease, visibility 1s;
+    perspective: 1600px; overflow-y: auto;
+  }
+  .gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+  .gate-caption {
+    font-family: var(--font-type); font-size: 0.72rem; letter-spacing: 0.24em;
+    text-transform: uppercase; color: #c9b98a; text-align: center; flex-shrink: 0;
+  }
+
+  .envelope {
+    width: min(380px, 84vw); aspect-ratio: 3 / 2; position: relative;
+    transform-style: preserve-3d; flex-shrink: 0; cursor: pointer;
+  }
+  .env-body {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 20% 15%, rgba(255,255,255,0.35), transparent 30%),
+      linear-gradient(155deg, var(--paper) 0%, var(--paper-2) 55%, var(--paper-3) 100%);
+    box-shadow: 0 26px 64px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.5) inset;
+  }
+  .env-body::before {
+    content: ""; position: absolute; inset: 8px; padding: 6px; border-radius: 1px;
+    background: repeating-linear-gradient(-45deg,
+      var(--airmail-red) 0 9px, var(--paper) 9px 13px,
+      var(--airmail-blue) 13px 22px, var(--paper) 22px 26px);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+  .env-address {
+    position: absolute; left: 12%; bottom: 18%;
+    font-family: var(--font-type); color: var(--ink);
+  }
+  .env-address .to { font-size: 0.65rem; letter-spacing: 0.18em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 0.35rem; }
+  .env-address .name { font-size: 1.5rem; }
+  .env-address .sub { font-size: 0.72rem; color: var(--ink-soft); margin-top: 0.2rem; }
+
+  .env-stamp {
+    position: absolute; top: 10%; right: 9%; width: 46px; height: 56px;
+    background: linear-gradient(160deg, var(--paper-2), var(--paper-3));
+    box-shadow: 0 0 0 1px var(--paper-shadow) inset, 0 2px 4px rgba(0,0,0,0.2);
+    -webkit-mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
+    -webkit-mask-size: 8px 8px; -webkit-mask-repeat: round;
+    mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
+    mask-size: 8px 8px; mask-repeat: round;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .env-stamp svg { width: 22px; height: 22px; color: var(--postmark); }
+  .env-postmark {
+    position: absolute; top: 9%; right: 20%; width: 62px; height: 62px;
+    border: 1.5px solid var(--postmark); border-radius: 50%; opacity: 0.6;
+    transform: rotate(-14deg); display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-type); font-size: 0.5rem; color: var(--postmark);
+    text-align: center; line-height: 1.3;
+  }
+  .env-postmark::before, .env-postmark::after {
+    content: ""; position: absolute; top: 50%; width: 12px; height: 1.5px; background: var(--postmark);
+  }
+  .env-postmark::before { left: -14px; }
+  .env-postmark::after { right: -14px; }
+
+  .env-flap {
+    position: absolute; inset: 0;
+    background: linear-gradient(200deg, var(--paper-2), var(--paper-3));
+    clip-path: polygon(0 0, 100% 0, 50% 58%);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2) inset;
+    transform-origin: 50% 0%;
+    transition: transform 1.1s cubic-bezier(.6,0,.3,1);
+    z-index: 3;
+  }
+  .env-flap.open { transform: rotateX(-165deg); }
+
+  .env-seal-wrap {
+    position: absolute; left: 50%; top: 50%; width: 66px; height: 66px;
+    margin: -33px 0 0 -33px; z-index: 4; cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+  .env-seal-wrap:hover { transform: scale(1.06); }
+  .env-seal-wrap:focus-visible { outline: 2px solid #ecdfc0; outline-offset: 4px; border-radius: 50%; }
+  .seal-half {
+    position: absolute; inset: 0;
+    border-radius: 46% 54% 61% 39% / 42% 46% 54% 58%;
+    background: radial-gradient(circle at 32% 26%, var(--seal-light), var(--seal) 55%, var(--seal-dark) 100%);
+    box-shadow: 0 3px 9px rgba(0,0,0,0.45);
+    transition: transform 0.7s cubic-bezier(.5,-0.2,.4,1.3), opacity 0.7s ease;
+  }
+  .seal-half.l { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+  .seal-half.r { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); }
+  .seal-half::after {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(circle at 40% 35%, rgba(255,255,255,0.25), transparent 40%),
+                radial-gradient(circle, transparent 40%, rgba(0,0,0,0.22) 100%);
+    border-radius: inherit;
+  }
+  .env-seal-wrap.cracked .seal-half.l { transform: translate(-15px, 5px) rotate(-20deg); opacity: 0; }
+  .env-seal-wrap.cracked .seal-half.r { transform: translate(15px, -5px) rotate(20deg); opacity: 0; }
+  .env-seal-mark {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    z-index: 1; pointer-events: none;
+  }
+  .env-seal-mark svg { width: 26px; height: 26px; color: rgba(236,223,192,0.8); }
+
+  .gate-btn {
+    flex-shrink: 0; background: none; border: 1px solid rgba(236,223,192,0.4); color: #ecdfc0;
+    font-family: var(--font-type); font-size: 0.78rem; letter-spacing: 0.08em;
+    padding: 0.7rem 1.6rem; border-radius: 2px; transition: background 0.3s, border-color 0.3s, opacity 0.4s;
+  }
+  .gate-btn:hover { background: rgba(236,223,192,0.08); border-color: #ecdfc0; }
+  .gate.opening .gate-btn { opacity: 0; pointer-events: none; }
+
+  /* ================= DECK SCENE ================= */
+  .deck-scene {
+    position: fixed; inset: 0; z-index: 10;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 2rem 1.2rem; opacity: 0; visibility: hidden;
+    transition: opacity 0.8s ease, visibility 0.8s;
+  }
+  .deck-scene.active { opacity: 1; visibility: visible; }
+
+  .stack-pile {
+    position: absolute; left: 6%; bottom: 8%;
+    width: 90px; height: 60px;
+    pointer-events: none;
+  }
+  @media (max-width: 640px) { .stack-pile { left: 4%; bottom: 16%; transform: scale(0.75); transform-origin: bottom left; } }
+  .stack-pile .ghost {
+    position: absolute; inset: 0; border-radius: 3px;
+    background: linear-gradient(160deg, var(--paper), var(--paper-2));
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.4) inset;
+    border: 1px solid var(--paper-shadow);
+  }
+
+  .postcard-stage { position: relative; width: min(420px, 90vw); aspect-ratio: 3/2; }
+  .postcard {
+    position: absolute; inset: 0;
+    background: var(--paper);
+    box-shadow: 0 24px 50px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.5) inset;
+    border-radius: 2px;
+    clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
+    display: flex;
+    transition: transform 0.55s cubic-bezier(.3,.6,.3,1), opacity 0.5s ease, filter 0.5s ease;
+    will-change: transform;
+  }
+  .postcard.slot-front { transform: translate(0,0) rotate(0deg) scale(1); z-index: 5; filter: brightness(1); }
+  .postcard.slot-peek1 { transform: translate(11px,16px) rotate(3deg) scale(0.94); z-index: 3; filter: brightness(0.92); pointer-events: none; }
+  .postcard.slot-peek2 { transform: translate(19px,29px) rotate(6deg) scale(0.88); z-index: 2; filter: brightness(0.82); pointer-events: none; }
+  .postcard.slot-peek2-enter { transform: translate(24px,36px) rotate(8deg) scale(0.8); opacity: 0; z-index: 2; pointer-events: none; }
+  .postcard.slot-toss { transform: translate(-230px,175px) rotate(-30deg) scale(0.28); opacity: 0; z-index: 6; pointer-events: none; }
+
+  .pc-message {
+    flex: 1.35; padding: 1.6rem 1.3rem; display: flex; align-items: center;
+    font-size: clamp(1rem, 3.4vw, 1.24rem); color: var(--ink);
+  }
+  .pc-divider { width: 1px; background: repeating-linear-gradient(180deg, var(--paper-shadow) 0 6px, transparent 6px 11px); margin: 1rem 0; }
+  .pc-right { flex: 1; padding: 0.85rem 0.85rem 0.7rem; display: flex; flex-direction: column; gap: 0.45rem; position: relative; }
+  .pc-photo {
+    width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 2px; display: block;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.08);
+    filter: sepia(0.38) saturate(1.05) contrast(1.03) brightness(0.95);
+  }
+  .pc-badge {
+    position: absolute; left: 0.55rem; bottom: 2.5rem; width: 22px; height: 22px; border-radius: 50%;
+    background: var(--paper); box-shadow: 0 2px 5px rgba(0,0,0,0.35);
+    display: flex; align-items: center; justify-content: center; color: var(--accent);
+  }
+  .pc-badge svg { width: 12px; height: 12px; }
+  .pc-stamp {
+    position: absolute; top: 0.7rem; right: 0.85rem; width: 26px; height: 33px;
+    background: linear-gradient(160deg, var(--paper-2), var(--paper-3));
+    box-shadow: 0 0 0 1px var(--paper-shadow) inset;
+    -webkit-mask-image: radial-gradient(circle 1.8px at 3px 3px, transparent 1.6px, #000 1.8px);
+    -webkit-mask-size: 5.5px 5.5px; -webkit-mask-repeat: round;
+    mask-image: radial-gradient(circle 1.8px at 3px 3px, transparent 1.6px, #000 1.8px);
+    mask-size: 5.5px 5.5px; mask-repeat: round;
+  }
+  .pc-lines { display: flex; flex-direction: column; gap: 0.35rem; margin-top: 0.1rem; }
+  .pc-lines span { display: block; height: 1px; background: var(--paper-shadow); opacity: 0.7; }
+  .pc-lines span:first-child { width: 70%; }
+  .pc-addr {
+    font-family: var(--font-type); font-size: 0.58rem; letter-spacing: 0.06em;
+    color: var(--ink-faint); margin-top: auto;
+  }
+
+  .deck-controls { display: flex; align-items: center; gap: 1.4rem; margin-top: 1.6rem; }
+  .deck-nav {
+    width: 42px; height: 42px; border-radius: 50%; border: 1px solid rgba(236,223,192,0.35);
+    background: none; color: #ecdfc0; display: flex; align-items: center; justify-content: center;
+    transition: background 0.25s, opacity 0.25s;
+  }
+  .deck-nav:hover { background: rgba(236,223,192,0.1); }
+  .deck-nav:disabled { opacity: 0.3; pointer-events: none; }
+  .deck-nav svg { width: 16px; height: 16px; }
+  .deck-progress { font-family: var(--font-type); font-size: 0.68rem; letter-spacing: 0.14em; color: #c9b98a; min-width: 4.5em; text-align: center; }
+  .deck-hint { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8a7f63; margin-top: 1rem; opacity: 0.8; }
+
+  /* ---------- outro: cards gather back into the envelope ---------- */
+  .outro {
+    position: fixed; inset: 0; z-index: 70;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6rem;
+    background: radial-gradient(ellipse at 50% 45%, var(--desk) 0%, var(--desk-2) 100%);
+    opacity: 0; visibility: hidden; transition: opacity 1s ease, visibility 1s;
+  }
+  .outro.shown { opacity: 1; visibility: visible; }
+  .outro-envelope { width: 130px; height: 88px; position: relative; }
+  .outro-body {
+    position: absolute; inset: 0;
+    background: linear-gradient(155deg, var(--paper), var(--paper-2));
+    box-shadow: 0 20px 50px rgba(0,0,0,0.55);
+  }
+  .outro-flap {
+    position: absolute; inset: 0;
+    background: linear-gradient(200deg, var(--paper-2), var(--paper-3));
+    clip-path: polygon(0 0, 100% 0, 50% 58%);
+    transform-origin: 50% 0%;
+    transform: rotateX(-165deg);
+    transition: transform 1s cubic-bezier(.4,0,.2,1) 1.1s;
+  }
+  .outro.closing .outro-flap { transform: rotateX(0deg); }
+  .outro-seal {
+    position: absolute; left: 50%; top: 50%; width: 32px; height: 32px; margin: -16px 0 0 -16px;
+    border-radius: 46% 54% 61% 39% / 42% 46% 54% 58%;
+    background: radial-gradient(circle at 32% 26%, var(--seal-light), var(--seal) 55%, var(--seal-dark) 100%);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    z-index: 2; opacity: 0; transform: scale(0.4);
+    transition: opacity 0.4s ease 2.15s, transform 0.4s cubic-bezier(.3,1.6,.4,1) 2.15s;
+  }
+  .outro.closing .outro-seal { opacity: 1; transform: scale(1); }
+  .outro-card {
+    position: absolute; left: 50%; top: 130%; width: 70px; height: 46px; margin-left: -35px;
+    background: linear-gradient(160deg, var(--paper), var(--paper-2));
+    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    border-radius: 2px;
+    transition: top 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1), opacity 0.5s ease;
+  }
+  .outro.closing .outro-card { top: 40%; opacity: 0; }
+  .outro-line { font-family: var(--font-hand); font-size: 1.5rem; color: #ecdfc0; text-align: center; opacity: 0; transition: opacity 1s ease 2.4s; }
+  .outro.closing .outro-line { opacity: 1; }
+  .outro-sub { font-family: var(--font-type); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a99a76; opacity: 0; transition: opacity 1s ease 2.6s; }
+  .outro.closing .outro-sub { opacity: 1; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .postcard, .env-flap, .seal-half, .outro-flap, .outro-seal, .outro-card, .outro-line, .outro-sub { transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+
+<div class="desk-grain"></div>
+
+<button class="sound-toggle" id="soundToggle" aria-label="Mute music" aria-pressed="false">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+    <path d="M4 9v6h4l5 5V4L8 9H4z"></path>
+    <path d="M16.5 8.5a5 5 0 0 1 0 7"></path>
+    <path d="M19 6a9 9 0 0 1 0 12"></path>
+  </svg>
+</button>
+
+<div class="gate" id="gate">
+  <p class="gate-caption">a few things I never said out loud</p>
+  <div class="envelope" id="envelope">
+    <div class="env-body paper-fiber">
+      <div class="env-postmark">16 JUL<br>2026</div>
+      <div class="env-stamp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4 5.6 20.8 8 13.6 2 9.2h7.6z"/></svg></div>
+      <div class="env-address">
+        <p class="to">hand delivered — no rush</p>
+        <p class="name">You</p>
+        <p class="sub">wherever you're standing right now</p>
+      </div>
+    </div>
+    <div class="env-flap paper-fiber" id="envFlap">
+      <div class="env-seal-wrap" id="sealWrap" role="button" tabindex="0" aria-label="Break the wax seal and open the letter">
+        <span class="seal-half l"></span>
+        <span class="seal-half r"></span>
+        <span class="env-seal-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-9C.7 8.1 2.6 4 6.5 4c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.9 0 5.8 4.1 4 8-2.5 4.65-9.5 9-9.5 9z"/></svg></span>
+      </div>
+    </div>
+  </div>
+  <button class="gate-btn" id="breakSeal">break the seal</button>
+</div>
+
+<div class="deck-scene" id="deckScene">
+  <div class="stack-pile" id="stackPile"></div>
+  <div class="postcard-stage" id="stage"></div>
+  <div class="deck-controls">
+    <button class="deck-nav" id="prevBtn" aria-label="Previous">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <p class="deck-progress" id="progress">1 / 6</p>
+    <button class="deck-nav" id="nextBtn" aria-label="Next">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </div>
+  <p class="deck-hint">tap, swipe, or use the arrows</p>
+</div>
+
+<div class="outro" id="outro">
+  <div class="outro-envelope">
+    <div class="outro-card"></div>
+    <div class="outro-body paper-fiber"></div>
+    <div class="outro-flap paper-fiber" id="outroFlap"></div>
+    <div class="outro-seal"></div>
+  </div>
+  <p class="outro-line">In your corner. Always.</p>
+  <p class="outro-sub">kept, for you</p>
+</div>
+
+
+<p style="position:fixed;left:0;right:0;bottom:0.4rem;z-index:65;text-align:center;font-family:'Special Elite',monospace;font-size:0.5rem;letter-spacing:0.03em;color:#8a7f63;opacity:0.55;pointer-events:none;">
+  photos via Wikimedia Commons — summit: Onteora12 (CC BY-SA 3.0) · muddy track: Jonathan Thacker (CC BY-SA 2.0) · lighthouse: AaronJoePick (CC BY-SA 4.0) · compass: Thomas Quine (CC BY 2.0)
+</p>
+
+<script>
+(function () {
+  "use strict";
+  var reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var body = document.body;
+  body.classList.add("locked");
+
+  /* ---------------- music: layered pad + evolving music-box motif + reverb ---------------- */
+  var audioCtx = null, master = null, reverbSend = null, musicOn = false, musicStarted = false, loopTimer = null, phraseToggle = 0;
+
+  function makeImpulse(ctx, seconds, decay) {
+    var rate = ctx.sampleRate;
+    var length = rate * seconds;
+    var impulse = ctx.createBuffer(2, length, rate);
+    for (var ch = 0; ch < 2; ch++) {
+      var data = impulse.getChannelData(ch);
+      for (var i = 0; i < length; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / length, decay);
+      }
+    }
+    return impulse;
+  }
+
+  function playNote(freq, time, dur, peak, dest) {
+    var o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o1.type = "sine"; o1.frequency.value = freq;
+    o2.type = "sine"; o2.frequency.value = freq * 2.01; // faint bright overtone for a bell-like, less flat tone
+    var g2 = audioCtx.createGain(); g2.gain.value = 0.16;
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(peak, time + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    o1.connect(g);
+    o2.connect(g2); g2.connect(g);
+    g.connect(dest);
+    o1.start(time); o1.stop(time + dur + 0.05);
+    o2.start(time); o2.stop(time + dur + 0.05);
+  }
+
+  function scheduleMotif() {
+    if (!audioCtx || !musicOn) return;
+    var now = audioCtx.currentTime + 0.1;
+    var phraseA = [261.63, 311.13, 392.0, 523.25, 392.0, 311.13];
+    var phraseB = [293.66, 349.23, 440.0, 349.23, 293.66, 220.0];
+    var notes = phraseToggle % 2 === 0 ? phraseA : phraseB;
+    phraseToggle++;
+    notes.forEach(function (f, i) { playNote(f, now + i * 0.52, 1.5, 0.042, reverbSend); });
+    loopTimer = setTimeout(scheduleMotif, 5400);
+  }
+
+  function startMusic() {
+    if (musicStarted) return;
+    musicStarted = true;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      master = audioCtx.createGain(); master.gain.value = 0; master.connect(audioCtx.destination);
+
+      var convolver = audioCtx.createConvolver();
+      convolver.buffer = makeImpulse(audioCtx, 2.4, 2.2);
+      var wetGain = audioCtx.createGain(); wetGain.gain.value = 0.55;
+      convolver.connect(wetGain); wetGain.connect(master);
+      reverbSend = audioCtx.createGain(); reverbSend.gain.value = 1;
+      reverbSend.connect(convolver);
+      reverbSend.connect(master); // dry path too
+
+      [130.81, 196.0, 164.81].forEach(function (f, idx) {
+        var o = audioCtx.createOscillator(); o.type = idx === 2 ? "triangle" : "sine"; o.frequency.value = f;
+        var g = audioCtx.createGain(); g.gain.value = idx === 2 ? 0.014 : 0.03;
+        var lfo = audioCtx.createOscillator(), lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 0.05 + idx * 0.017; lfoGain.gain.value = 2.4;
+        lfo.connect(lfoGain); lfoGain.connect(o.detune);
+        o.connect(g); g.connect(master); o.start(); lfo.start();
+      });
+
+      // faint room-tone texture for warmth/realism
+      var bufferSize = audioCtx.sampleRate * 2;
+      var noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      var nd = noiseBuffer.getChannelData(0);
+      for (var i = 0; i < bufferSize; i++) nd[i] = Math.random() * 2 - 1;
+      var noise = audioCtx.createBufferSource(); noise.buffer = noiseBuffer; noise.loop = true;
+      var noiseFilter = audioCtx.createBiquadFilter(); noiseFilter.type = "bandpass"; noiseFilter.frequency.value = 2200; noiseFilter.Q.value = 0.5;
+      var noiseGain = audioCtx.createGain(); noiseGain.gain.value = 0.008;
+      noise.connect(noiseFilter); noiseFilter.connect(noiseGain); noiseGain.connect(master);
+      noise.start();
+
+      var now = audioCtx.currentTime;
+      master.gain.linearRampToValueAtTime(0.5, now + 2.5);
+      musicOn = true; scheduleMotif();
+    } catch (e) {}
+  }
+
+  function toggleMusic() {
+    if (!musicStarted) { startMusic(); updateSoundIcon(); return; }
+    if (!audioCtx) return;
+    var now = audioCtx.currentTime;
+    if (musicOn) {
+      master.gain.cancelScheduledValues(now); master.gain.linearRampToValueAtTime(0, now + 0.6);
+      musicOn = false; if (loopTimer) clearTimeout(loopTimer);
+    } else {
+      master.gain.cancelScheduledValues(now); master.gain.linearRampToValueAtTime(0.5, now + 0.6);
+      musicOn = true; scheduleMotif();
+    }
+    updateSoundIcon();
+  }
+  var soundToggle = document.getElementById("soundToggle");
+  function updateSoundIcon() {
+    soundToggle.setAttribute("aria-pressed", String(!musicOn));
+    soundToggle.style.opacity = musicOn ? "1" : "0.55";
+  }
+  soundToggle.addEventListener("click", toggleMusic);
+
+  function flick() {
+    if (!audioCtx) return;
+    var bufferSize = audioCtx.sampleRate * 0.15;
+    var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    var data = buffer.getChannelData(0);
+    for (var i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+    var noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+    var filter = audioCtx.createBiquadFilter(); filter.type = "highpass"; filter.frequency.value = 1200;
+    var g = audioCtx.createGain(); g.gain.value = 0.16;
+    noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination);
+    noise.start();
+  }
+  function chime() {
+    if (!audioCtx) return;
+    playNote(880, audioCtx.currentTime, 1.4, 0.09, reverbSend || audioCtx.destination);
+    playNote(1108.7, audioCtx.currentTime + 0.12, 1.5, 0.06, reverbSend || audioCtx.destination);
+  }
+
+  /* ---------------- envelope gate ---------------- */
+  var gate = document.getElementById("gate");
+  var envFlap = document.getElementById("envFlap");
+  var sealWrap = document.getElementById("sealWrap");
+  var breakSealBtn = document.getElementById("breakSeal");
+  var deckScene = document.getElementById("deckScene");
+  var opened = false;
+
+  function openEnvelope() {
+    if (opened) return;
+    opened = true;
+    startMusic(); updateSoundIcon();
+    breakSealBtn.disabled = true;
+    sealWrap.classList.add("cracked");
+    gate.classList.add("opening");
+    setTimeout(function () { envFlap.classList.add("open"); }, 350);
+    setTimeout(function () {
+      gate.classList.add("hidden");
+      body.classList.remove("locked");
+      soundToggle.classList.add("shown");
+      deckScene.classList.add("active");
+      initStack();
+    }, reduced ? 300 : 2100);
+  }
+  breakSealBtn.addEventListener("click", openEnvelope);
+  sealWrap.addEventListener("click", openEnvelope);
+  sealWrap.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openEnvelope(); }
+  });
+
+  /* ---------------- postcard stack ---------------- */
+  var cards = [
+    {
+      img: "/lab/images/postcards/hope.jpg",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="4"/><path d="M4 17c0-2 2-3 4-3h8c2 0 4 1 4 3"/></svg>',
+      text: "Hey. I know it's been a heavy stretch, and I didn't want another week to go by without you hearing this straight from me."
+    },
+    {
+      img: "/lab/images/postcards/pride.jpg",
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4 5.6 20.8 8 13.6 2 9.2h7.6z"/></svg>',
+      text: "I need you to know — I am proud of you. Not for having it all figured out. For still getting up on the days it would've been so much easier not to."
+    },
+    {
+      img: "/lab/images/postcards/road.jpg",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 18l7-11 4 6 3-4 4 9"/></svg>',
+      text: "Remember the year we got the car stuck in the mud for four hours and laughed so hard neither of us could push? You've out-survived worse odds than this."
+    },
+    {
+      img: "/lab/images/postcards/music.jpg",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>',
+      text: "Or the world's worst karaoke night, when you sang like nobody was watching — because honestly, nobody should've been. I still think about it and grin."
+    },
+    {
+      img: "/lab/images/postcards/support.jpg",
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-9C.7 8.1 2.6 4 6.5 4c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.9 0 5.8 4.1 4 8-2.5 4.65-9.5 9-9.5 9z"/></svg>',
+      text: "You are not carrying this by yourself, even when it feels that way. Call me at 2am. Show up unannounced. I mean that literally, not as a nice thing to say."
+    },
+    {
+      img: "/lab/images/postcards/compass.jpg",
+      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8l2 4-2 4-2-4z"/></svg>',
+      text: "I believe in you — not the polite kind of belief. The kind that's watched you rebuild before and knows you'll do it again. I've got you. I'm not going anywhere."
+    }
+  ];
+
+  var stage = document.getElementById("stage");
+  var stackPile = document.getElementById("stackPile");
+  var prevBtn = document.getElementById("prevBtn");
+  var nextBtn = document.getElementById("nextBtn");
+  var progress = document.getElementById("progress");
+  var current = 0;
+
+  function cardHTML(i) {
+    var c = cards[i];
+    return '<div class="pc-message">' + c.text + '</div>' +
+      '<div class="pc-divider"></div>' +
+      '<div class="pc-right">' +
+        '<img class="pc-photo" src="' + c.img + '" alt="" />' +
+        '<div class="pc-stamp"></div>' +
+        '<div class="pc-badge">' + c.icon + '</div>' +
+        '<div class="pc-lines"><span></span><span></span></div>' +
+        '<p class="pc-addr">' + (i + 1) + ' / ' + cards.length + '</p>' +
+      '</div>';
+  }
+
+  function makeCardEl(i, slotClass) {
+    var el = document.createElement("div");
+    el.className = "postcard " + slotClass;
+    el.innerHTML = cardHTML(i);
+    return el;
+  }
+
+  function addGhost(i) {
+    var g = document.createElement("div");
+    g.className = "ghost";
+    var rot = (i % 2 === 0 ? -1 : 1) * (3 + (i % 3) * 2);
+    g.style.transform = "translate(" + (i * 3) + "px," + (-i * 2) + "px) rotate(" + rot + "deg)";
+    g.style.zIndex = String(i);
+    stackPile.appendChild(g);
+  }
+  function removeLastGhost() {
+    var last = stackPile.lastElementChild;
+    if (last) last.remove();
+  }
+
+  function initStack() {
+    stage.innerHTML = "";
+    var front = makeCardEl(0, "slot-front");
+    stage.appendChild(front);
+    if (cards.length > 1) stage.appendChild(makeCardEl(1, "slot-peek1"));
+    if (cards.length > 2) stage.appendChild(makeCardEl(2, "slot-peek2"));
+    updateControls();
+  }
+
+  function updateControls() {
+    prevBtn.disabled = current === 0;
+    progress.textContent = (current + 1) + " / " + cards.length;
+  }
+
+  function goNext() {
+    if (current >= cards.length - 1) { finishDeck(); return; }
+    var front = stage.querySelector(".slot-front");
+    var peek1 = stage.querySelector(".slot-peek1");
+    var peek2 = stage.querySelector(".slot-peek2");
+
+    if (front) {
+      front.classList.remove("slot-front");
+      front.classList.add("slot-toss");
+      setTimeout(function () { front.remove(); }, 560);
+    }
+    if (peek1) { peek1.classList.remove("slot-peek1"); peek1.classList.add("slot-front"); }
+    if (peek2) { peek2.classList.remove("slot-peek2"); peek2.classList.add("slot-peek1"); }
+
+    addGhost(current);
+    flick();
+    current++;
+
+    var newDeepIndex = current + 2;
+    if (newDeepIndex < cards.length) {
+      var el = makeCardEl(newDeepIndex, "slot-peek2-enter");
+      stage.appendChild(el);
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          el.classList.remove("slot-peek2-enter");
+          el.classList.add("slot-peek2");
+        });
+      });
+    }
+    updateControls();
+  }
+
+  function goPrev() {
+    if (current <= 0) return;
+    var front = stage.querySelector(".slot-front");
+    var peek1 = stage.querySelector(".slot-peek1");
+    var peek2 = stage.querySelector(".slot-peek2");
+
+    if (peek2) peek2.remove();
+    if (peek1) { peek1.classList.remove("slot-peek1"); peek1.classList.add("slot-peek2"); }
+    if (front) { front.classList.remove("slot-front"); front.classList.add("slot-peek1"); }
+
+    removeLastGhost();
+    flick();
+    current--;
+
+    var el = makeCardEl(current, "slot-toss");
+    stage.appendChild(el);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        el.classList.remove("slot-toss");
+        el.classList.add("slot-front");
+      });
+    });
+    updateControls();
+  }
+
+  nextBtn.addEventListener("click", goNext);
+  prevBtn.addEventListener("click", goPrev);
+
+  var touchStartX = null;
+  stage.addEventListener("touchstart", function (e) { touchStartX = e.touches[0].clientX; }, { passive: true });
+  stage.addEventListener("touchend", function (e) {
+    if (touchStartX === null) return;
+    var dx = e.changedTouches[0].clientX - touchStartX;
+    if (dx < -40) goNext(); else if (dx > 40) goPrev();
+    touchStartX = null;
+  }, { passive: true });
+  stage.addEventListener("click", function (e) {
+    var rect = stage.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    if (x > rect.width / 2) goNext(); else goPrev();
+  });
+
+  /* ---------------- outro: gather into envelope ---------------- */
+  var outro = document.getElementById("outro");
+  function finishDeck() {
+    var front = stage.querySelector(".slot-front");
+    if (front) { front.classList.remove("slot-front"); front.classList.add("slot-toss"); }
+    setTimeout(function () {
+      deckScene.classList.remove("active");
+      outro.classList.add("shown");
+      requestAnimationFrame(function () {
+        setTimeout(function () { outro.classList.add("closing"); chime(); }, 250);
+      });
+    }, 450);
+  }
+})();
+</script>
+
+</body>
+</html>
