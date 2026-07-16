@@ -68,24 +68,28 @@
   .sound-toggle:hover { color: var(--seal); }
   .sound-toggle svg { width: 17px; height: 17px; }
 
-  /* ================= GATE / ENVELOPE ================= */
-  .gate {
-    position: fixed; inset: 0; z-index: 50;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 1.6rem; padding: 4.5rem 1rem 2rem;
-    background: radial-gradient(ellipse at 50% 38%, var(--desk) 0%, var(--desk-2) 100%);
-    transition: opacity 1s ease, visibility 1s;
-    perspective: 1600px; overflow-y: auto;
+  /* ================= PERSISTENT ENVELOPE ================= */
+  .envelope-shell {
+    position: fixed; z-index: 45;
+    width: min(380px, 84vw); aspect-ratio: 3 / 2;
+    top: 50%; left: 50%; transform: translate(-50%, -50%);
+    transition: top 1.15s cubic-bezier(.4,0,.2,1), left 1.15s cubic-bezier(.4,0,.2,1), width 1.15s cubic-bezier(.4,0,.2,1);
+    perspective: 1600px;
+    pointer-events: none;
   }
-  .gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-  .gate-caption {
-    font-family: var(--font-type); font-size: 0.68rem; letter-spacing: 0.22em;
-    text-transform: uppercase; color: var(--gold); text-align: center; flex-shrink: 0;
+  .envelope-shell.corner {
+    width: 82px;
+    top: calc(100% - 68px);
+    left: 70px;
+  }
+  .envelope-shell.hide-details .env-address,
+  .envelope-shell.hide-details .env-stamp {
+    opacity: 0;
   }
 
   .envelope {
-    width: min(380px, 84vw); aspect-ratio: 3 / 2; position: relative;
-    transform-style: preserve-3d; flex-shrink: 0; cursor: pointer;
+    width: 100%; height: 100%; position: relative;
+    transform-style: preserve-3d;
   }
   .env-body {
     position: absolute; inset: 0;
@@ -97,6 +101,7 @@
   .env-address {
     position: absolute; left: 12%; bottom: 16%;
     color: var(--ink);
+    transition: opacity 0.4s ease;
   }
   .env-address .to { font-family: var(--font-hand); font-size: 1.05rem; color: var(--ink-soft); margin: 0 0 0.1rem; }
   .env-address .name { font-family: var(--font-hand); font-size: 1.85rem; margin: 0 0 0.55rem; }
@@ -114,6 +119,7 @@
     mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
     mask-size: 8px 8px; mask-repeat: round;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;
+    transition: opacity 0.4s ease;
   }
   .env-stamp .stamp-label {
     font-family: var(--font-type); font-size: 0.48rem; letter-spacing: 0.04em;
@@ -136,6 +142,7 @@
     position: absolute; left: 50%; top: 50%; width: 66px; height: 66px;
     margin: -33px 0 0 -33px; z-index: 4; cursor: pointer;
     transition: transform 0.2s ease;
+    pointer-events: auto;
   }
   .env-seal-wrap:hover { transform: scale(1.06); }
   .env-seal-wrap:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 50%; }
@@ -182,13 +189,27 @@
   }
   .env-seal-mark svg { width: 24px; height: 24px; color: rgba(246,239,228,0.85); }
 
+  /* ================= GATE CHROME (caption + button, envelope lives separately) ================= */
+  .gate-caption {
+    position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
+    top: calc(50% - (min(380px, 84vw) / 3) - 2.9rem);
+    font-family: var(--font-type); font-size: 0.68rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--gold); text-align: center;
+    transition: opacity 1s ease, visibility 1s;
+  }
   .gate-btn {
-    flex-shrink: 0; background: none; border: 1px solid rgba(44,43,61,0.3); color: var(--ink);
+    position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
+    top: calc(50% + (min(380px, 84vw) / 3) + 1.7rem);
+    background: none; border: 1px solid rgba(44,43,61,0.3); color: var(--ink);
     font-family: var(--font-type); font-size: 0.78rem; letter-spacing: 0.08em;
-    padding: 0.7rem 1.6rem; border-radius: 2px; transition: background 0.3s, border-color 0.3s, opacity 0.4s;
+    padding: 0.7rem 1.6rem; border-radius: 2px;
+    transition: opacity 1s ease, visibility 1s, background 0.3s, border-color 0.3s;
   }
   .gate-btn:hover { background: rgba(44,43,61,0.06); border-color: var(--ink-faint); }
-  .gate.opening .gate-btn { opacity: 0; pointer-events: none; }
+  .gate.hidden .gate-caption,
+  .gate.hidden .gate-btn {
+    opacity: 0; visibility: hidden; pointer-events: none;
+  }
 
   /* ================= DECK SCENE ================= */
   .deck-scene {
@@ -199,28 +220,10 @@
   }
   .deck-scene.active { opacity: 1; visibility: visible; }
 
-  .stack-pile {
-    position: absolute; left: 6%; bottom: 8%;
-    width: 108px; height: 72px;
-    pointer-events: none;
-  }
-  @media (max-width: 640px) { .stack-pile { left: 4%; bottom: 16%; transform: scale(0.75); transform-origin: bottom left; } }
-  .stack-pile .ghost {
-    position: absolute; left: 0; bottom: 0; width: 76px; height: 50px;
-    border-radius: 3px;
-    background: linear-gradient(160deg, var(--paper), var(--paper-2));
-    box-shadow: 0 6px 14px rgba(0,0,0,0.28), 0 1px 0 rgba(255,255,255,0.5) inset;
-    border: 1px solid var(--paper-shadow);
-  }
-  .stack-pile .ghost::after {
-    content: "";
-    position: absolute; top: 6px; left: 6px; width: 14px; height: 14px;
-    border-radius: 2px; background: var(--seal); opacity: 0.15;
-  }
-
   .postcard-stage { position: relative; width: min(420px, 90vw); aspect-ratio: 3/2; perspective: 1200px; }
   .postcard {
     position: absolute; inset: 0;
+    --tx: -180px; --ty: 260px;
     background: var(--paper);
     box-shadow: 0 20px 44px rgba(0,0,0,0.22), 0 2px 6px rgba(0,0,0,0.12), 0 1px 0 rgba(255,255,255,0.5) inset;
     border: 1px solid var(--paper-shadow);
@@ -237,44 +240,27 @@
   .postcard.slot-peek2-enter { transform: translate3d(31px,41px,-50px) rotateX(2deg) rotateY(-4deg) rotateZ(2.5deg) scale(0.83); opacity: 0; z-index: 2; pointer-events: none; }
   @keyframes gatherOut {
     0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); opacity: 1; }
-    35%  { transform: translate3d(-70px,-50px,-50px) rotateX(-4deg) rotateY(120deg) rotateZ(-10deg) scale(0.75); opacity: 1; }
-    70%  { transform: translate3d(-170px,40px,-150px) rotateX(-10deg) rotateY(280deg) rotateZ(-20deg) scale(0.45); opacity: 0.75; }
-    100% { transform: translate3d(-230px,175px,-260px) rotateX(-16deg) rotateY(420deg) rotateZ(-26deg) scale(0.26); opacity: 0; }
+    35%  { transform: translate3d(calc(var(--tx) * 0.22), calc(var(--ty) * 0.16), -50px) rotateX(-4deg) rotateY(120deg) rotateZ(-10deg) scale(0.72); opacity: 1; }
+    70%  { transform: translate3d(calc(var(--tx) * 0.62), calc(var(--ty) * 0.6), -150px) rotateX(-10deg) rotateY(280deg) rotateZ(-20deg) scale(0.38); opacity: 0.7; }
+    100% { transform: translate3d(var(--tx), var(--ty), -220px) rotateX(-16deg) rotateY(420deg) rotateZ(-26deg) scale(0.08); opacity: 0; }
   }
   @keyframes gatherIn {
-    0%   { transform: translate3d(-230px,175px,-260px) rotateX(-16deg) rotateY(420deg) rotateZ(-26deg) scale(0.26); opacity: 0; }
-    30%  { transform: translate3d(-170px,40px,-150px) rotateX(-10deg) rotateY(280deg) rotateZ(-20deg) scale(0.45); opacity: 0.75; }
-    65%  { transform: translate3d(-70px,-50px,-50px) rotateX(-4deg) rotateY(120deg) rotateZ(-10deg) scale(0.75); opacity: 1; }
+    0%   { transform: translate3d(var(--tx), var(--ty), -220px) rotateX(-16deg) rotateY(420deg) rotateZ(-26deg) scale(0.08); opacity: 0; }
+    30%  { transform: translate3d(calc(var(--tx) * 0.62), calc(var(--ty) * 0.6), -150px) rotateX(-10deg) rotateY(280deg) rotateZ(-20deg) scale(0.38); opacity: 0.7; }
+    65%  { transform: translate3d(calc(var(--tx) * 0.22), calc(var(--ty) * 0.16), -50px) rotateX(-4deg) rotateY(120deg) rotateZ(-10deg) scale(0.72); opacity: 1; }
     100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); opacity: 1; }
   }
   .postcard.gather-out-anim { animation: gatherOut 0.72s cubic-bezier(.3,.6,.3,1) forwards; z-index: 6; pointer-events: none; }
   .postcard.gather-in-anim { animation: gatherIn 0.72s cubic-bezier(.3,.6,.3,1) forwards; z-index: 6; pointer-events: none; }
 
-  /* ---------- the belief card: bare stage, hold to reveal ---------- */
-  .pc-message-peak { flex-direction: column; align-items: center; justify-content: flex-start; text-align: center; gap: 1.1rem; }
-  .peak-hold-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: opacity 0.5s ease; }
-  .peak-hold-wrap.done { opacity: 0; pointer-events: none; height: 0; overflow: hidden; margin: 0; }
-  .peak-hold-btn {
-    width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid var(--seal);
-    background: var(--paper-2); position: relative; touch-action: none;
-    -webkit-user-select: none; user-select: none; display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 3px 10px rgba(0,0,0,0.18);
-  }
-  .peak-hold-ring {
-    position: absolute; inset: -1.5px; border-radius: 50%;
-    background: conic-gradient(var(--seal) calc(var(--p, 0) * 1%), transparent 0);
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
-  }
-  .peak-hold-icon { width: 20px; height: 20px; color: var(--ink); transform: rotate(-40deg); }
-  .peak-hold-label { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
-  .peak-text { font-family: var(--font-hand); font-size: 1.28rem; color: var(--ink); line-height: 1.55; margin: 0; }
-  .peak-reveal-wrap { display: inline; clip-path: inset(0 100% 0 0); transition: clip-path 0.05s linear; }
-  .peak-text.shown .peak-reveal-wrap { clip-path: inset(0 0% 0 0); }
-
   .pc-message {
     flex: 1.35; padding: 1.6rem 1.3rem; display: flex; align-items: flex-start;
     font-size: clamp(0.92rem, 3vw, 1.1rem); color: var(--ink); overflow: hidden;
+  }
+  .pc-message-peak-text {
+    flex: 1; align-items: center; text-align: center;
+    font-family: var(--font-hand); font-size: 1.35rem; line-height: 1.55;
+    padding: 2rem 2.2rem;
   }
   .pc-divider { width: 1px; background: repeating-linear-gradient(180deg, var(--paper-shadow) 0 6px, transparent 6px 11px); margin: 1rem 0; }
   .pc-right { flex: 1; padding: 0.85rem 0.85rem 0.7rem; display: flex; flex-direction: column; gap: 0.45rem; position: relative; }
@@ -302,61 +288,30 @@
   .pc-lines span { display: block; height: 1px; background: var(--paper-shadow); opacity: 0.7; }
   .pc-lines span:first-child { width: 70%; }
 
-  .deck-hint { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8a7f63; margin-top: 2.2rem; opacity: 0.8; transition: opacity 0.6s ease; }
+  .deck-hint {
+    font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: #8a7f63; margin-top: 2.2rem; opacity: 0.8; transition: opacity 0.6s ease;
+  }
 
-  /* ---------- outro: cards gather back into the envelope ---------- */
-  .outro {
-    position: fixed; inset: 0; z-index: 70;
-    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.6rem;
-    background: radial-gradient(ellipse at 50% 45%, var(--desk) 0%, var(--desk-2) 100%);
-    opacity: 0; visibility: hidden; transition: opacity 1s ease, visibility 1s;
+  /* ---------- closing text ---------- */
+  .closing-text {
+    position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
+    top: calc(50% + (min(380px, 84vw) / 3) + 2rem);
+    text-align: center; opacity: 0; transition: opacity 1s ease; pointer-events: none;
   }
-  .outro.shown { opacity: 1; visibility: visible; }
-  .outro-envelope { width: 130px; height: 88px; position: relative; }
-  .outro-body {
-    position: absolute; inset: 0;
-    background: linear-gradient(155deg, var(--paper), var(--paper-2));
-    box-shadow: 0 20px 50px rgba(0,0,0,0.55);
-  }
-  .outro-flap {
-    position: absolute; inset: 0;
-    background: linear-gradient(200deg, var(--paper-2), var(--paper-3));
-    clip-path: polygon(0 0, 100% 0, 50% 58%);
-    transform-origin: 50% 0%;
-    transform: rotateX(-165deg);
-    transition: transform 1s cubic-bezier(.4,0,.2,1) 1.1s;
-  }
-  .outro.closing .outro-flap { transform: rotateX(0deg); }
-  .outro-seal {
-    position: absolute; left: 50%; top: 50%; width: 32px; height: 32px; margin: -16px 0 0 -16px;
-    border-radius: 50%;
-    background: radial-gradient(circle at 32% 26%, var(--seal-light), var(--seal) 55%, var(--seal-dark) 100%);
-    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
-    z-index: 2; opacity: 0; transform: scale(0.4);
-    transition: opacity 0.4s ease 2.15s, transform 0.4s cubic-bezier(.3,1.6,.4,1) 2.15s;
-  }
-  .outro.closing .outro-seal { opacity: 1; transform: scale(1); }
-  .outro-card {
-    position: absolute; left: 50%; top: 130%; width: 70px; height: 46px; margin-left: -35px;
-    background: linear-gradient(160deg, var(--paper), var(--paper-2));
-    box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-    border-radius: 2px;
-    transition: top 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1), opacity 0.5s ease;
-  }
-  .outro.closing .outro-card { top: 40%; opacity: 0; }
-  .outro-line { font-family: var(--font-hand); font-size: 1.5rem; color: var(--ink); text-align: center; opacity: 0; transition: opacity 1s ease 2.4s; }
-  .outro.closing .outro-line { opacity: 1; }
-  .outro-sub { font-family: var(--font-type); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); opacity: 0; transition: opacity 1s ease 2.6s; }
-  .outro.closing .outro-sub { opacity: 1; }
+  .closing-text.shown { opacity: 1; }
+  .closing-line { font-family: var(--font-hand); font-size: 1.5rem; color: var(--ink); margin: 0 0 0.3rem; }
+  .closing-sub { font-family: var(--font-type); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin: 0; }
 
   @media (prefers-reduced-motion: reduce) {
-    .postcard, .env-flap, .seal-half, .outro-flap, .outro-seal, .outro-card, .outro-line, .outro-sub { transition: none !important; }
+    .postcard, .env-flap, .seal-half, .envelope-shell, .gate-caption, .gate-btn, .closing-text {
+      transition: none !important;
+    }
     .postcard.gather-out-anim, .postcard.gather-in-anim { animation: none !important; }
   }
 </style>
 </head>
 <body>
-
 
 <div class="desk-grain"></div>
 
@@ -368,9 +323,8 @@
   </svg>
 </button>
 
-<div class="gate" id="gate">
-  <p class="gate-caption">delivered · by hand · no. 001</p>
-  <div class="envelope" id="envelope">
+<div class="envelope-shell" id="envelopeShell">
+  <div class="envelope">
     <div class="env-body paper-fiber">
       <div class="env-stamp">
         <span class="stamp-label">GOODWILL</span>
@@ -391,26 +345,22 @@
       <span class="env-seal-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-9C.7 8.1 2.6 4 6.5 4c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.9 0 5.8 4.1 4 8-2.5 4.65-9.5 9-9.5 9z"/></svg></span>
     </div>
   </div>
+</div>
+
+<div class="gate" id="gate">
+  <p class="gate-caption">delivered · by hand · no. 001</p>
   <button class="gate-btn" id="breakSeal">break the seal</button>
 </div>
 
 <div class="deck-scene" id="deckScene">
-  <div class="stack-pile" id="stackPile"></div>
   <div class="postcard-stage" id="stage"></div>
-  <p class="deck-hint">tap or swipe to continue</p>
+  <p class="deck-hint" id="deckHint">tap or swipe to continue</p>
 </div>
 
-<div class="outro" id="outro">
-  <div class="outro-envelope">
-    <div class="outro-card"></div>
-    <div class="outro-body paper-fiber"></div>
-    <div class="outro-flap paper-fiber" id="outroFlap"></div>
-    <div class="outro-seal"></div>
-  </div>
-  <p class="outro-line">In your corner. Always.</p>
-  <p class="outro-sub">kept, for you</p>
+<div class="closing-text" id="closingText">
+  <p class="closing-line">In your corner. Always.</p>
+  <p class="closing-sub">kept, for you</p>
 </div>
-
 
 <p style="position:fixed;left:0;right:0;bottom:0.4rem;z-index:65;text-align:center;font-family:'Special Elite',monospace;font-size:0.5rem;letter-spacing:0.03em;color:#8a7f63;opacity:0.55;pointer-events:none;">
   photos via Wikimedia Commons — summit: Onteora12 (CC BY-SA 3.0) · muddy track: Jonathan Thacker (CC BY-SA 2.0) · lighthouse: AaronJoePick (CC BY-SA 4.0) · compass: Thomas Quine (CC BY 2.0)
@@ -532,12 +482,15 @@
     playNote(1108.7, audioCtx.currentTime + 0.12, 1.5, 0.06, reverbSend || audioCtx.destination);
   }
 
-  /* ---------------- envelope gate ---------------- */
+  /* ---------------- envelope: gate open + corner + closing ---------------- */
   var gate = document.getElementById("gate");
+  var envelopeShell = document.getElementById("envelopeShell");
   var envFlap = document.getElementById("envFlap");
   var sealWrap = document.getElementById("sealWrap");
   var breakSealBtn = document.getElementById("breakSeal");
   var deckScene = document.getElementById("deckScene");
+  var deckHint = document.getElementById("deckHint");
+  var closingText = document.getElementById("closingText");
   var opened = false;
 
   function openEnvelope() {
@@ -546,12 +499,13 @@
     startMusic(); updateSoundIcon();
     breakSealBtn.disabled = true;
     sealWrap.classList.add("cracked");
-    gate.classList.add("opening");
     setTimeout(function () { envFlap.classList.add("open"); }, 350);
     setTimeout(function () {
       gate.classList.add("hidden");
       body.classList.remove("locked");
       soundToggle.classList.add("shown");
+      envelopeShell.classList.add("corner");
+      envelopeShell.classList.add("hide-details");
       deckScene.classList.add("active");
       initStack();
     }, reduced ? 300 : 2100);
@@ -590,38 +544,20 @@
       text: "You are not carrying this by yourself, even when it feels that way. Call me at 2am. Show up unannounced. I mean that literally, not as a nice thing to say."
     },
     {
-      img: "/lab/images/postcards/compass.jpg",
-      icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M12 8l2 4-2 4-2-4z"/></svg>',
       text: "I believe in you — not the polite kind of belief. The kind that's watched you rebuild before and knows you'll do it again. I've got you. I'm not going anywhere."
     }
   ];
 
   var stage = document.getElementById("stage");
-  var stackPile = document.getElementById("stackPile");
-  var deckHint = document.querySelector(".deck-hint");
   var current = 0;
-  var beliefRevealed = false;
 
   function cardHTML(i) {
     var c = cards[i];
     var isPeak = i === cards.length - 1;
-    var messageHTML;
     if (isPeak) {
-      messageHTML =
-        '<div class="pc-message pc-message-peak">' +
-          '<div class="peak-hold-wrap">' +
-            '<button class="peak-hold-btn" type="button" aria-label="Hold to reveal">' +
-              '<span class="peak-hold-ring"></span>' +
-              '<svg class="peak-hold-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.7 3.3a1 1 0 0 0-1.4 0L4 18.6V20h1.4L20.7 4.7a1 1 0 0 0 0-1.4zM3 21l1.5-5L9 20.5z"/></svg>' +
-            '</button>' +
-            '<p class="peak-hold-label">hold to reveal</p>' +
-          '</div>' +
-          '<p class="peak-text"><span class="peak-reveal-wrap">' + c.text + '</span></p>' +
-        '</div>';
-    } else {
-      messageHTML = '<div class="pc-message">' + c.text + '</div>';
+      return '<div class="pc-message pc-message-peak-text">' + c.text + '</div>';
     }
-    return messageHTML +
+    return '<div class="pc-message">' + c.text + '</div>' +
       '<div class="pc-divider"></div>' +
       '<div class="pc-right">' +
         '<img class="pc-photo" src="' + c.img + '" alt="" />' +
@@ -631,91 +567,11 @@
       '</div>';
   }
 
-  function bindPeakHold(cardEl) {
-    var holdBtn = cardEl.querySelector(".peak-hold-btn");
-    var holdRing = cardEl.querySelector(".peak-hold-ring");
-    var holdWrap = cardEl.querySelector(".peak-hold-wrap");
-    var peakTextEl = cardEl.querySelector(".peak-text");
-    if (!holdBtn) return;
-
-    var holding = false, raf = null, startTime = 0;
-    var DURATION = reduced ? 400 : 1700;
-
-    function setProgress(p) { holdRing.style.setProperty("--p", String(p * 100)); }
-
-    function animate(ts) {
-      if (!startTime) startTime = ts;
-      var elapsed = ts - startTime;
-      var pct = Math.min(1, elapsed / DURATION);
-      setProgress(pct);
-      if (pct >= 1) { complete(); return; }
-      if (holding) raf = requestAnimationFrame(animate);
-    }
-
-    function springBack() {
-      var currentPct = parseFloat(holdRing.style.getPropertyValue("--p")) || 0;
-      var start = null;
-      function step(ts) {
-        if (!start) start = ts;
-        var t = Math.min(1, (ts - start) / 350);
-        setProgress(currentPct * (1 - t) / 100);
-        if (t < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-
-    function complete() {
-      if (beliefRevealed) return;
-      beliefRevealed = true;
-      holdWrap.classList.add("done");
-      peakTextEl.classList.add("shown");
-      chime();
-      if (deckHint) deckHint.style.opacity = "0";
-      setTimeout(function () { finishDeck(); }, reduced ? 300 : 3400);
-    }
-
-    function beginHold(e) {
-      if (beliefRevealed) return;
-      e.preventDefault();
-      holding = true;
-      startTime = 0;
-      raf = requestAnimationFrame(animate);
-    }
-    function endHold() {
-      if (beliefRevealed) return;
-      holding = false;
-      if (raf) cancelAnimationFrame(raf);
-      springBack();
-    }
-    holdBtn.addEventListener("pointerdown", beginHold);
-    holdBtn.addEventListener("pointerup", endHold);
-    holdBtn.addEventListener("pointerleave", endHold);
-    holdBtn.addEventListener("pointercancel", endHold);
-    holdBtn.addEventListener("click", function (e) { e.stopPropagation(); });
-    holdBtn.addEventListener("keydown", function (e) {
-      if ((e.key === "Enter" || e.key === " ") && !beliefRevealed) { e.preventDefault(); complete(); }
-    });
-  }
-
   function makeCardEl(i, slotClass) {
     var el = document.createElement("div");
     el.className = "postcard " + slotClass;
     el.innerHTML = cardHTML(i);
-    if (i === cards.length - 1) bindPeakHold(el);
     return el;
-  }
-
-  function addGhost(i) {
-    var g = document.createElement("div");
-    g.className = "ghost";
-    var rot = (i % 2 === 0 ? -1 : 1) * (4 + (i % 3) * 3);
-    g.style.transform = "translate(" + (i * 6) + "px," + (-i * 4) + "px) rotate(" + rot + "deg)";
-    g.style.zIndex = String(i);
-    stackPile.appendChild(g);
-  }
-  function removeLastGhost() {
-    var last = stackPile.lastElementChild;
-    if (last) last.remove();
   }
 
   function initStack() {
@@ -726,9 +582,31 @@
     if (cards.length > 2) stage.appendChild(makeCardEl(2, "slot-peek2"));
   }
 
+  /* offset from the postcard stage's center to the envelope's current on-screen center --
+     measured at runtime so the "fly into the envelope" animation stays correct regardless
+     of where the envelope actually is (corner on every viewport size, per the current design,
+     but this also keeps it correct through the transition itself if triggered mid-move). */
+  function applyFlyVars(el) {
+    var envRect = envelopeShell.getBoundingClientRect();
+    var stageRect = stage.getBoundingClientRect();
+    var tx = (envRect.left + envRect.width / 2) - (stageRect.left + stageRect.width / 2);
+    var ty = (envRect.top + envRect.height / 2) - (stageRect.top + stageRect.height / 2);
+    el.style.setProperty("--tx", tx + "px");
+    el.style.setProperty("--ty", ty + "px");
+  }
+
+  var peakTimer = null;
+  function updatePeakTimer() {
+    if (peakTimer) { clearTimeout(peakTimer); peakTimer = null; }
+    var atPeak = current === cards.length - 1;
+    if (deckHint) deckHint.style.opacity = atPeak ? "0" : "0.8";
+    if (atPeak) {
+      peakTimer = setTimeout(finishDeck, reduced ? 400 : 2800);
+    }
+  }
+
   function goNext() {
     if (current >= cards.length - 1) {
-      if (!beliefRevealed) return;
       finishDeck();
       return;
     }
@@ -741,6 +619,7 @@
       if (reduced) {
         front.remove();
       } else {
+        applyFlyVars(front);
         front.classList.add("gather-out-anim");
         front.addEventListener("animationend", function handler() {
           front.removeEventListener("animationend", handler);
@@ -751,7 +630,6 @@
     if (peek1) { peek1.classList.remove("slot-peek1"); peek1.classList.add("slot-front"); }
     if (peek2) { peek2.classList.remove("slot-peek2"); peek2.classList.add("slot-peek1"); }
 
-    addGhost(current);
     current++;
 
     var newDeepIndex = current + 2;
@@ -765,6 +643,7 @@
         });
       });
     }
+    updatePeakTimer();
   }
 
   function goPrev() {
@@ -777,10 +656,10 @@
     if (peek1) { peek1.classList.remove("slot-peek1"); peek1.classList.add("slot-peek2"); }
     if (front) { front.classList.remove("slot-front"); front.classList.add("slot-peek1"); }
 
-    removeLastGhost();
     current--;
 
     var el = makeCardEl(current, reduced ? "slot-front" : "gather-in-anim");
+    if (!reduced) applyFlyVars(el);
     stage.appendChild(el);
     if (!reduced) {
       el.addEventListener("animationend", function handler() {
@@ -789,6 +668,7 @@
         el.classList.add("slot-front");
       });
     }
+    updatePeakTimer();
   }
 
   var touchStartX = null;
@@ -805,27 +685,39 @@
     if (x > rect.width / 2) goNext(); else goPrev();
   });
 
-  /* ---------------- outro: gather into envelope ---------------- */
-  var outro = document.getElementById("outro");
+  /* ---------------- closing: envelope grows back to center, closes, reseals ---------------- */
   var finishing = false;
   function finishDeck() {
     if (finishing) return;
     finishing = true;
+    if (peakTimer) { clearTimeout(peakTimer); peakTimer = null; }
+
     var front = stage.querySelector(".slot-front");
     if (front) {
       front.classList.remove("slot-front");
-      if (reduced) { front.remove(); } else { front.classList.add("gather-out-anim"); }
+      if (reduced) {
+        front.remove();
+      } else {
+        applyFlyVars(front);
+        front.classList.add("gather-out-anim");
+      }
     }
+
     setTimeout(function () {
       deckScene.classList.remove("active");
-      outro.classList.add("shown");
-      requestAnimationFrame(function () {
-        setTimeout(function () { outro.classList.add("closing"); chime(); }, 250);
-      });
-    }, reduced ? 200 : 560);
+      envelopeShell.classList.remove("corner");
+      envelopeShell.classList.remove("hide-details");
+      setTimeout(function () {
+        envFlap.classList.remove("open");
+        setTimeout(function () {
+          sealWrap.classList.remove("cracked");
+          chime();
+          closingText.classList.add("shown");
+        }, reduced ? 100 : 950);
+      }, reduced ? 100 : 1150);
+    }, reduced ? 200 : 700);
   }
 })();
 </script>
-
 </body>
 </html>
