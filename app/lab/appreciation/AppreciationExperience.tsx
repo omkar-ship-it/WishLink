@@ -40,7 +40,7 @@ const PEAK_TEXT =
 function HeroSection({ reduced }: { reduced: boolean }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0, 0.65, 1], [1, 1, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.45, 1], [1, 1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
   const y = useTransform(scrollYProgress, [0, 1], [0, -40]);
 
@@ -66,7 +66,7 @@ function HeroSection({ reduced }: { reduced: boolean }) {
   }, [counterInView, reduced]);
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "140vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "105vh" }}>
       <div className={styles.pinInner}>
         <motion.div className={styles.measure} style={{ opacity, scale, y }}>
           <p className={styles.eyebrow}>for Eswari</p>
@@ -90,11 +90,11 @@ function HeroSection({ reduced }: { reduced: boolean }) {
 function WhySection() {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0, 0.15, 0.85, 1], [0, 1, 1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.15], [30, 0]);
+  const opacity = useTransform(scrollYProgress, [0, 0.2, 0.8, 1], [0, 1, 1, 0]);
+  const y = useTransform(scrollYProgress, [0, 0.2], [30, 0]);
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "125vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "95vh" }}>
       <div className={styles.pinInner}>
         <motion.div className={styles.measure} style={{ opacity, y }}>
           <div className={styles.divider} />
@@ -143,7 +143,7 @@ function QuotesSection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "180vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "130vh" }}>
       <div className={styles.pinInner}>
         <div className={styles.quoteWrap}>
           {QUOTES.map((_, i) => (
@@ -187,7 +187,7 @@ function GallerySection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "220vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "170vh" }}>
       <div className={styles.pinInner}>
         <div className={styles.galleryWrap}>
           {MEMORIES.map((m, i) => (
@@ -329,7 +329,7 @@ function PeakSection({ onRevealed }: { onRevealed?: () => void }) {
   const words = PEAK_TEXT.split(" ");
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "190vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "150vh" }}>
       <div className={styles.pinInner}>
         <motion.p ref={textRef} className={styles.peakLine} style={{ opacity }}>
           {words.map((w, i) => (
