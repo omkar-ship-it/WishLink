@@ -66,7 +66,7 @@ function HeroSection({ reduced }: { reduced: boolean }) {
   }, [counterInView, reduced]);
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "180vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "140vh" }}>
       <div className={styles.pinInner}>
         <motion.div className={styles.measure} style={{ opacity, scale, y }}>
           <p className={styles.eyebrow}>for Eswari</p>
@@ -94,7 +94,7 @@ function WhySection() {
   const y = useTransform(scrollYProgress, [0, 0.15], [30, 0]);
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "160vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "125vh" }}>
       <div className={styles.pinInner}>
         <motion.div className={styles.measure} style={{ opacity, y }}>
           <div className={styles.divider} />
@@ -143,7 +143,7 @@ function QuotesSection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "260vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "180vh" }}>
       <div className={styles.pinInner}>
         <div className={styles.quoteWrap}>
           {QUOTES.map((_, i) => (
@@ -187,7 +187,7 @@ function GallerySection() {
   const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "300vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "220vh" }}>
       <div className={styles.pinInner}>
         <div className={styles.galleryWrap}>
           {MEMORIES.map((m, i) => (
@@ -329,7 +329,7 @@ function PeakSection({ onRevealed }: { onRevealed?: () => void }) {
   const words = PEAK_TEXT.split(" ");
 
   return (
-    <div ref={ref} className={styles.pinOuter} style={{ height: "260vh" }}>
+    <div ref={ref} className={styles.pinOuter} style={{ height: "190vh" }}>
       <div className={styles.pinInner}>
         <motion.p ref={textRef} className={styles.peakLine} style={{ opacity }}>
           {words.map((w, i) => (
@@ -435,7 +435,7 @@ export default function AppreciationExperience() {
   const prefersReduced = useReducedMotion();
   const reduced = prefersReduced === true;
 
-  const [stage, setStage] = useState<"gate" | "reading">("gate");
+  const [stage, setStage] = useState<"gate" | "reading" | "outro">("gate");
   const [sealCracked, setSealCracked] = useState(false);
   const [flapOpen, setFlapOpen] = useState(false);
   const [musicOn, setMusicOn] = useState(false);
@@ -620,6 +620,11 @@ export default function AppreciationExperience() {
     window.setTimeout(() => setStage("reading"), reduced ? 200 : 2000);
   }
 
+  function foldClosed() {
+    setStage("outro");
+    window.setTimeout(playChime, reduced ? 100 : 1400);
+  }
+
   return (
     <MotionConfig reducedMotion="user">
       <div className={styles.page}>
@@ -722,9 +727,58 @@ export default function AppreciationExperience() {
               <p className={styles.closingSub}>Here&rsquo;s to the ones we haven&rsquo;t lived yet.</p>
               <p className={styles.signature}>Always yours, and completely.</p>
               <p className={styles.footerNote}>written on a quiet evening &middot; 16 July 2026</p>
+              <button className={styles.foldBtn} onClick={foldClosed}>
+                fold the letter closed
+              </button>
             </div>
           </>
         )}
+
+        <AnimatePresence>
+          {stage === "outro" && (
+            <motion.div
+              className={styles.gate}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: reduced ? 0.2 : 1 }}
+            >
+              <div className={styles.outroEnvelope}>
+                <div className={styles.envBody} />
+                <motion.div
+                  className={styles.envFlap}
+                  style={{ transformOrigin: "50% 0%" }}
+                  initial={{ rotateX: -165 }}
+                  animate={{ rotateX: 0 }}
+                  transition={{ duration: reduced ? 0.2 : 1, delay: reduced ? 0.1 : 0.3, ease: [0.4, 0, 0.2, 1] }}
+                >
+                  <motion.div
+                    className={styles.sealWhole}
+                    style={{ position: "absolute", left: "50%", top: "50%", width: 44, height: 44, marginLeft: -22, marginTop: -22 }}
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ duration: reduced ? 0.2 : 0.5, delay: reduced ? 0.15 : 1.3, ease: [0.3, 1.6, 0.4, 1] }}
+                  />
+                </motion.div>
+              </div>
+              <motion.p
+                className={styles.outroLine}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: reduced ? 0.2 : 1, delay: reduced ? 0.2 : 1.8 }}
+              >
+                Kept, always.
+              </motion.p>
+              <motion.p
+                className={styles.outroSub}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: reduced ? 0.2 : 1, delay: reduced ? 0.25 : 2.0 }}
+              >
+                for Eswari
+              </motion.p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </MotionConfig>
   );
