@@ -207,7 +207,7 @@
     border: 1px solid var(--paper-shadow);
   }
 
-  .postcard-stage { position: relative; width: min(420px, 90vw); aspect-ratio: 3/2; }
+  .postcard-stage { position: relative; width: min(420px, 90vw); aspect-ratio: 3/2; perspective: 1200px; }
   .postcard {
     position: absolute; inset: 0;
     background: var(--paper);
@@ -215,14 +215,15 @@
     border-radius: 2px;
     clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
     display: flex;
+    backface-visibility: hidden;
     transition: transform 0.55s cubic-bezier(.3,.6,.3,1), opacity 0.5s ease, filter 0.5s ease;
     will-change: transform;
   }
-  .postcard.slot-front { transform: translate(0,0) rotate(0deg) scale(1); z-index: 5; filter: brightness(1); }
-  .postcard.slot-peek1 { transform: translate(11px,16px) rotate(3deg) scale(0.94); z-index: 3; filter: brightness(0.92); pointer-events: none; }
-  .postcard.slot-peek2 { transform: translate(19px,29px) rotate(6deg) scale(0.88); z-index: 2; filter: brightness(0.82); pointer-events: none; }
-  .postcard.slot-peek2-enter { transform: translate(24px,36px) rotate(8deg) scale(0.8); opacity: 0; z-index: 2; pointer-events: none; }
-  .postcard.slot-toss { transform: translate(-230px,175px) rotate(-30deg) scale(0.28); opacity: 0; z-index: 6; pointer-events: none; }
+  .postcard.slot-front { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); z-index: 5; filter: brightness(1); }
+  .postcard.slot-peek1 { transform: translate3d(11px,16px,-22px) rotateX(2deg) rotateY(-5deg) rotateZ(3deg) scale(0.94); z-index: 3; filter: brightness(0.92); pointer-events: none; }
+  .postcard.slot-peek2 { transform: translate3d(19px,29px,-42px) rotateX(3deg) rotateY(-8deg) rotateZ(6deg) scale(0.88); z-index: 2; filter: brightness(0.82); pointer-events: none; }
+  .postcard.slot-peek2-enter { transform: translate3d(24px,36px,-56px) rotateX(4deg) rotateY(-10deg) rotateZ(8deg) scale(0.8); opacity: 0; z-index: 2; pointer-events: none; }
+  .postcard.slot-toss { transform: translate3d(-230px,175px,-260px) rotateX(-16deg) rotateY(400deg) rotateZ(-26deg) scale(0.26); opacity: 0; z-index: 6; pointer-events: none; transition-duration: 0.64s; }
 
   .pc-message {
     flex: 1.35; padding: 1.6rem 1.3rem; display: flex; align-items: center;
@@ -643,7 +644,7 @@
     if (front) {
       front.classList.remove("slot-front");
       front.classList.add("slot-toss");
-      setTimeout(function () { front.remove(); }, 560);
+      setTimeout(function () { front.remove(); }, 650);
     }
     if (peek1) { peek1.classList.remove("slot-peek1"); peek1.classList.add("slot-front"); }
     if (peek2) { peek2.classList.remove("slot-peek2"); peek2.classList.add("slot-peek1"); }
@@ -719,7 +720,7 @@
       requestAnimationFrame(function () {
         setTimeout(function () { outro.classList.add("closing"); chime(); }, 250);
       });
-    }, 450);
+    }, 520);
   }
 })();
 </script>
