@@ -4,576 +4,787 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>For Chinni</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --ink: #12132a;
-    --ink-2: #1a1c3a;
-    --ink-3: #242850;
-    --ink-4: #2f335f;
-    --ivory: #f6efe4;
-    --ivory-dim: #b9b2c4;
-    --ivory-faint: #8b86a3;
-    --marigold: #f0a83a;
-    --marigold-soft: #f0a83a99;
-    --rosecopper: #e2896a;
-    --leaf: #7ea084;
-    --hairline: #f0a83a3d;
+    --desk: #241d18;
+    --desk-2: #17110d;
+    --paper: #ecdfc0;
+    --paper-2: #e2d1a4;
+    --paper-3: #d8c491;
+    --paper-shadow: #b9a877;
+    --ink: #2c2b3d;
+    --ink-soft: #57536d;
+    --ink-faint: #78748f;
+    --seal: #7a1f2b;
+    --seal-light: #9c3040;
+    --seal-dark: #5c1620;
+    --postmark: #3c5245;
+    --gold: #a3803a;
+    --airmail-red: #9c3030;
+    --airmail-blue: #2f4a66;
 
-    --font-display: "Iowan Old Style", "Palatino Linotype", Palatino, "URW Palladio L", Georgia, serif;
-    --font-body: Optima, Candara, "Noto Sans", "Segoe UI", "Century Gothic", sans-serif;
+    --font-hand: 'Kalam', cursive;
+    --font-type: 'Special Elite', monospace;
 
-    --fs-xs: 0.72rem;
-    --fs-sm: 0.95rem;
-    --fs-base: 1.125rem;
-    --fs-md: 1.6rem;
-    --fs-lg: clamp(1.9rem, 4vw, 2.8rem);
-    --fs-xl: clamp(2.6rem, 7vw, 4.6rem);
+    --fs-note: 1.08rem;
+    --fs-body: 1.3rem;
+    --fs-salut: 1.6rem;
+    --fs-peak: clamp(1.9rem, 5.4vw, 3rem);
 
-    color-scheme: dark;
+    color-scheme: light;
   }
 
   * { box-sizing: border-box; }
   html, body {
     margin: 0;
     padding: 0;
-    background: var(--ink);
-    color: var(--ivory);
-    overflow-x: hidden;
-    scrollbar-width: thin;
-    scrollbar-color: var(--ink-4) var(--ink);
+    background: var(--desk);
+    color: var(--ink);
   }
-  body { font-family: var(--font-body); line-height: 1.6; }
+  body {
+    font-family: var(--font-hand);
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
   body.locked { overflow: hidden; height: 100vh; }
 
-  h1, h2, h3, .display {
-    font-family: var(--font-display);
-    font-weight: 400;
-    text-wrap: balance;
-    letter-spacing: 0.01em;
-  }
-
-  a { color: inherit; }
   button { font-family: inherit; cursor: pointer; }
+  ::selection { background: var(--seal-light); color: var(--paper); }
 
-  ::selection { background: var(--marigold-soft); color: var(--ink); }
-
-  .noise {
+  .desk-grain {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    z-index: 5;
-    opacity: 0.05;
-    mix-blend-mode: overlay;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  }
-
-  .vignette {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    z-index: 4;
-    background:
-      radial-gradient(ellipse at 50% 20%, transparent 0%, transparent 40%, rgba(18,19,42,0.55) 100%),
-      linear-gradient(180deg, rgba(18,19,42,0) 0%, rgba(18,19,42,0.9) 100%);
-  }
-
-  canvas#embers {
-    position: fixed;
-    inset: 0;
     z-index: 1;
-    width: 100%;
-    height: 100%;
-    pointer-events: none;
+    opacity: 0.5;
+    mix-blend-mode: overlay;
+    background:
+      radial-gradient(ellipse at 50% 0%, rgba(255,255,255,0.06), transparent 55%),
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   }
 
-  /* ---------- progress thread ---------- */
-  .progress-thread {
+  /* ---------- progress ribbon ---------- */
+  .ribbon-track {
     position: fixed;
-    top: 8vh;
-    bottom: 8vh;
-    right: 2.4rem;
-    width: 2px;
-    z-index: 20;
+    top: 6vh;
+    bottom: 6vh;
+    right: 1.6rem;
+    width: 6px;
+    z-index: 25;
     display: none;
   }
-  @media (min-width: 720px) {
-    .progress-thread { display: block; }
-  }
-  .thread-line {
+  @media (min-width: 780px) { .ribbon-track { display: block; } }
+  .ribbon-track .rail { position: absolute; inset: 0; background: rgba(236,223,192,0.14); border-radius: 3px; }
+  .ribbon-track .fill {
     position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent, var(--ink-4) 8%, var(--ink-4) 92%, transparent);
+    left: 0; right: 0; top: 0;
+    height: 0%;
+    background: linear-gradient(180deg, var(--seal-light), var(--seal));
+    border-radius: 3px;
+    transition: height 0.1s linear;
   }
-  .thread-dot {
+  .ribbon-track .tassel {
     position: absolute;
     left: 50%;
     top: 0%;
-    width: 9px;
-    height: 9px;
-    margin-left: -4.5px;
-    margin-top: -4.5px;
-    border-radius: 50%;
-    background: var(--marigold);
-    box-shadow: 0 0 10px 2px var(--marigold-soft);
-    transition: top 0.15s linear;
+    width: 16px;
+    height: 16px;
+    margin-left: -8px;
+    margin-top: -6px;
+    background: var(--seal);
+    clip-path: polygon(0 0, 100% 0, 100% 65%, 50% 100%, 0 65%);
+    transition: top 0.1s linear;
   }
 
   /* ---------- sound toggle ---------- */
   .sound-toggle {
     position: fixed;
-    top: 1.4rem;
-    right: 1.4rem;
-    z-index: 30;
-    width: 42px;
-    height: 42px;
+    top: 1.2rem;
+    right: 1.2rem;
+    z-index: 40;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
-    background: rgba(36,40,80,0.55);
-    border: 1px solid var(--hairline);
-    backdrop-filter: blur(6px);
+    background: var(--paper);
+    border: 1px solid var(--paper-shadow);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.35);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--ivory-dim);
+    color: var(--ink-soft);
     opacity: 0;
     transform: translateY(-6px);
-    transition: opacity 0.5s ease, transform 0.5s ease, color 0.2s, border-color 0.2s;
+    transition: opacity 0.5s ease, transform 0.5s ease, color 0.2s;
   }
   .sound-toggle.shown { opacity: 1; transform: translateY(0); }
-  .sound-toggle:hover { color: var(--marigold); border-color: var(--marigold-soft); }
-  .sound-toggle:focus-visible, button:focus-visible, .hold-btn:focus-visible {
-    outline: 2px solid var(--marigold);
+  .sound-toggle:hover { color: var(--seal); }
+  .sound-toggle svg { width: 17px; height: 17px; }
+  button:focus-visible, .sound-toggle:focus-visible {
+    outline: 2px solid var(--seal);
     outline-offset: 3px;
   }
-  .sound-toggle svg { width: 18px; height: 18px; }
 
-  /* ---------- gate ---------- */
+  /* ================= GATE / ENVELOPE ================= */
   .gate {
     position: fixed;
     inset: 0;
-    z-index: 40;
+    z-index: 50;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(ellipse at 50% 40%, var(--ink-3) 0%, var(--ink) 70%);
-    transition: opacity 1.1s ease, visibility 1.1s;
+    background: radial-gradient(ellipse at 50% 42%, var(--desk) 0%, var(--desk-2) 100%);
+    transition: opacity 1s ease, visibility 1s;
+    perspective: 1600px;
   }
   .gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
-  .gate-inner {
-    text-align: center;
-    padding: 2rem;
-    max-width: 30rem;
-  }
-  .eyebrow {
-    font-family: var(--font-body);
-    font-size: var(--fs-xs);
-    letter-spacing: 0.28em;
-    text-transform: uppercase;
-    color: var(--ivory-faint);
-    margin: 0 0 0.6rem;
-  }
-  .gate-name {
-    font-size: clamp(2.6rem, 10vw, 4.2rem);
-    font-style: italic;
-    margin: 0 0 2.2rem;
-    color: var(--ivory);
-  }
-
-  /* flame + lamp, shared motif */
-  .flame-wrap { display: flex; justify-content: center; margin-bottom: 1.6rem; }
-  .flame {
-    width: 20px;
-    height: 26px;
-    background: radial-gradient(circle at 50% 70%, #fff3d0 0%, var(--marigold) 45%, var(--rosecopper) 85%);
-    border-radius: 50% 50% 50% 0;
-    transform: rotate(-45deg);
-    box-shadow: 0 0 22px 6px var(--marigold-soft);
-    animation: flicker 2.6s ease-in-out infinite;
-    transform-origin: 50% 90%;
-  }
-  @keyframes flicker {
-    0%, 100% { transform: rotate(-45deg) scale(1); opacity: 1; }
-    25% { transform: rotate(-40deg) scale(1.05, 0.96); opacity: 0.92; }
-    50% { transform: rotate(-48deg) scale(0.95, 1.04); opacity: 1; }
-    75% { transform: rotate(-43deg) scale(1.02, 0.98); opacity: 0.95; }
-  }
-  .lamp-base {
-    width: 46px;
-    height: 14px;
-    margin: -4px auto 0;
-    background: linear-gradient(180deg, #3c3462, #201f42);
-    border-radius: 50% 50% 40% 40% / 70% 70% 30% 30%;
-    border: 1px solid var(--ink-4);
-  }
-
-  .gate-button {
-    background: transparent;
-    border: 1px solid var(--marigold-soft);
-    color: var(--ivory);
-    padding: 0.85rem 2.2rem;
-    border-radius: 2px;
-    font-size: var(--fs-sm);
-    letter-spacing: 0.06em;
-    transition: background 0.3s, border-color 0.3s, transform 0.2s;
-  }
-  .gate-button:hover { background: rgba(240,168,58,0.1); border-color: var(--marigold); transform: translateY(-1px); }
-  .gate-hint {
-    margin-top: 1.4rem;
-    font-size: var(--fs-xs);
-    color: var(--ivory-faint);
-    letter-spacing: 0.04em;
-  }
-
-  /* ---------- layout ---------- */
-  .main-content { position: relative; z-index: 10; }
-  section {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 6rem 1.5rem;
-    position: relative;
-  }
-  .measure {
-    max-width: 38rem;
-    width: 100%;
-    text-align: center;
-  }
-
-  .reveal { opacity: 0; transform: translateY(28px); transition: opacity 1s ease, transform 1s ease; }
-  .reveal.in-view { opacity: 1; transform: translateY(0); }
-
-  /* ---------- hero ---------- */
-  .hero-eyebrow { color: var(--marigold); font-size: var(--fs-xs); letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 1.2rem; }
-  .hero-counter {
-    font-family: var(--font-display);
-    font-size: clamp(5rem, 22vw, 10rem);
-    font-variant-numeric: tabular-nums;
-    line-height: 0.9;
-    color: var(--ivory);
-    margin: 0;
-  }
-  .hero-counter span.unit {
-    display: block;
-    font-family: var(--font-body);
-    font-size: var(--fs-sm);
-    letter-spacing: 0.35em;
-    text-transform: uppercase;
-    color: var(--ivory-faint);
-    margin-top: 0.8rem;
-  }
-  .hero-line {
-    font-size: var(--fs-lg);
-    margin: 2.4rem 0 1rem;
-    color: var(--ivory);
-  }
-  .hero-sub { color: var(--ivory-dim); font-size: var(--fs-base); }
-  .scroll-cue {
+  .gate-caption {
     position: absolute;
-    bottom: 2.4rem;
+    top: 12%;
     left: 50%;
     transform: translateX(-50%);
-    font-size: var(--fs-xs);
-    letter-spacing: 0.2em;
+    font-family: var(--font-type);
+    font-size: 0.72rem;
+    letter-spacing: 0.24em;
     text-transform: uppercase;
-    color: var(--ivory-faint);
+    color: #c9b98a;
+    text-align: center;
+  }
+
+  .envelope {
+    width: min(360px, 82vw);
+    aspect-ratio: 3 / 2;
+    position: relative;
+    transform-style: preserve-3d;
+  }
+  .env-body {
+    position: absolute;
+    inset: 0;
+    background: var(--paper);
+    box-shadow: 0 24px 60px rgba(0,0,0,0.5);
+  }
+  .env-body::before {
+    content: "";
+    position: absolute;
+    inset: 7px;
+    padding: 6px;
+    border-radius: 1px;
+    background: repeating-linear-gradient(-45deg,
+      var(--airmail-red) 0 9px, var(--paper) 9px 13px,
+      var(--airmail-blue) 13px 22px, var(--paper) 22px 26px);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+  .env-address {
+    position: absolute;
+    left: 12%;
+    bottom: 20%;
+    font-family: var(--font-type);
+    color: var(--ink);
+  }
+  .env-address .to { font-size: 0.65rem; letter-spacing: 0.18em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 0.35rem; }
+  .env-address .name { font-size: 1.5rem; }
+  .env-address .sub { font-size: 0.72rem; color: var(--ink-soft); margin-top: 0.2rem; }
+
+  .env-stamp {
+    position: absolute;
+    top: 10%;
+    right: 9%;
+    width: 46px;
+    height: 56px;
+    background: var(--paper-2);
+    box-shadow: 0 0 0 1px var(--paper-shadow) inset;
+    -webkit-mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
+    -webkit-mask-size: 8px 8px;
+    -webkit-mask-repeat: round;
+    mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
+    mask-size: 8px 8px;
+    mask-repeat: round;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-type);
+    color: var(--gold);
+    font-size: 1.4rem;
+  }
+  .env-postmark {
+    position: absolute;
+    top: 9%;
+    right: 20%;
+    width: 62px;
+    height: 62px;
+    border: 1.5px solid var(--postmark);
+    border-radius: 50%;
+    opacity: 0.65;
+    transform: rotate(-14deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-type);
+    font-size: 0.5rem;
+    color: var(--postmark);
+    text-align: center;
+    line-height: 1.3;
+  }
+  .env-postmark::before {
+    content: "";
+    position: absolute;
+    left: -14px; top: 50%;
+    width: 12px; height: 1.5px;
+    background: var(--postmark);
+  }
+  .env-postmark::after {
+    content: "";
+    position: absolute;
+    right: -14px; top: 50%;
+    width: 12px; height: 1.5px;
+    background: var(--postmark);
+  }
+
+  .env-flap {
+    position: absolute;
+    inset: 0;
+    background: var(--paper-2);
+    clip-path: polygon(0 0, 100% 0, 50% 58%);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15) inset;
+    transform-origin: 50% 0%;
+    transition: transform 1.1s cubic-bezier(.6,0,.3,1);
+    z-index: 3;
+  }
+  .env-flap.open { transform: rotateX(-165deg); }
+
+  .env-seal-wrap {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 60px;
+    height: 60px;
+    margin: -30px 0 0 -30px;
+    z-index: 4;
+  }
+  .seal-half {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal) 55%, var(--seal-dark) 100%);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.4);
+    transition: transform 0.7s cubic-bezier(.5,-0.2,.4,1.3), opacity 0.7s ease;
+  }
+  .seal-half.l { clip-path: polygon(0 0, 50% 0, 50% 100%, 0 100%); }
+  .seal-half.r { clip-path: polygon(50% 0, 100% 0, 100% 100%, 50% 100%); }
+  .seal-half::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle, transparent 45%, rgba(0,0,0,0.18) 100%);
+    border-radius: 50%;
+  }
+  .env-seal-wrap.cracked .seal-half.l { transform: translate(-14px, 4px) rotate(-18deg); opacity: 0; }
+  .env-seal-wrap.cracked .seal-half.r { transform: translate(14px, -4px) rotate(18deg); opacity: 0; }
+  .env-seal-mark {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(236,223,192,0.75);
+    font-family: var(--font-display, serif);
+    font-style: italic;
+    font-size: 1.6rem;
+    z-index: 1;
+  }
+
+  .gate-btn {
+    position: absolute;
+    left: 50%;
+    bottom: -4.4rem;
+    transform: translateX(-50%);
+    background: none;
+    border: 1px solid rgba(236,223,192,0.4);
+    color: #ecdfc0;
+    font-family: var(--font-type);
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    padding: 0.7rem 1.6rem;
+    border-radius: 2px;
+    transition: background 0.3s, border-color 0.3s;
+    white-space: nowrap;
+  }
+  .gate-btn:hover { background: rgba(236,223,192,0.08); border-color: #ecdfc0; }
+  .gate.opening .gate-btn { opacity: 0; pointer-events: none; }
+
+  .letter-slideout {
+    position: absolute;
+    left: 6%;
+    right: 6%;
+    top: 6%;
+    bottom: -30%;
+    background: var(--paper);
+    box-shadow: 0 -6px 24px rgba(0,0,0,0.25);
+    transform: translateY(6%) scale(0.94);
+    opacity: 0;
+    transition: transform 1.3s cubic-bezier(.2,.7,.2,1) 0.55s, opacity 0.9s ease 0.55s;
+    z-index: 2;
+  }
+  .gate.opening .letter-slideout { transform: translateY(-46%) scale(1.02); opacity: 1; }
+
+  /* ================= LETTER DOCUMENT ================= */
+  .desk-scroll {
+    position: relative;
+    z-index: 5;
+    min-height: 100vh;
+    padding: 4rem 1.2rem 8rem;
+    display: flex;
+    justify-content: center;
+  }
+  .letter-page {
+    width: 100%;
+    max-width: 38rem;
+    background: var(--paper);
+    background-image: radial-gradient(circle at 12% 18%, rgba(120,90,40,0.06), transparent 9%),
+                       radial-gradient(circle at 82% 62%, rgba(120,90,40,0.05), transparent 11%),
+                       radial-gradient(circle at 30% 85%, rgba(120,90,40,0.05), transparent 8%);
+    box-shadow: 0 30px 70px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.4) inset;
+    padding: 3.4rem 2.4rem 5rem;
+    position: relative;
+  }
+  @media (min-width: 640px) { .letter-page { padding: 4.2rem 4rem 6rem; } }
+
+  .page-fold {
+    position: absolute;
+    left: 0; right: 0;
+    height: 22px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.06), transparent 60%);
+    pointer-events: none;
+  }
+  .page-fold.f1 { top: 33%; }
+  .page-fold.f2 { top: 67%; }
+
+  .letterhead {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2.4rem;
+  }
+  .postmark-badge {
+    font-family: var(--font-type);
+    font-size: 0.62rem;
+    letter-spacing: 0.1em;
+    color: var(--postmark);
+    border: 1.5px solid var(--postmark);
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.3;
+    opacity: 0.7;
+    transform: rotate(6deg);
+    flex-shrink: 0;
+  }
+
+  .reveal { opacity: 0; transform: translateY(16px); transition: opacity 0.9s ease, transform 0.9s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+
+  .salutation {
+    font-size: var(--fs-salut);
+    color: var(--ink);
+    margin: 0 0 1.6rem;
+  }
+  .prose {
+    font-size: var(--fs-body);
+    color: var(--ink);
+    margin: 0 0 1.6rem;
+  }
+  .prose.soft { color: var(--ink-soft); }
+
+  .torn-a { clip-path: polygon(1% 6%, 12% 1%, 24% 5%, 37% 0%, 50% 4%, 63% 0%, 76% 5%, 88% 1%, 99% 6%, 100% 93%, 89% 99%, 76% 95%, 63% 100%, 50% 96%, 37% 100%, 24% 95%, 12% 99%, 0% 94%); }
+  .torn-b { clip-path: polygon(0% 4%, 14% 0%, 27% 4%, 41% 1%, 55% 5%, 69% 0%, 82% 4%, 100% 1%, 100% 95%, 86% 100%, 73% 96%, 59% 100%, 45% 95%, 31% 99%, 18% 95%, 0% 100%); }
+
+  .tucked-note {
+    max-width: 240px;
+    margin: 2.6rem auto;
+    padding: 1.2rem 1.4rem 1.4rem;
+    background: var(--paper-2);
+    box-shadow: 0 10px 22px rgba(43,36,32,0.28);
+    transform: rotate(var(--r, -3deg));
+    position: relative;
+  }
+  .tucked-note p {
+    font-family: var(--font-hand);
+    font-size: 1.2rem;
+    color: var(--ink);
+    margin: 0;
+    text-align: center;
+  }
+  .tucked-note .pin {
+    position: absolute;
+    left: 50%;
+    top: -7px;
+    width: 12px;
+    height: 12px;
+    margin-left: -6px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal-dark));
+    box-shadow: 0 2px 3px rgba(0,0,0,0.4);
+  }
+
+  .photo-corner {
+    width: 100%;
+    max-width: 250px;
+    margin: 2.2rem auto;
+    padding: 12px 12px 30px;
+    background: var(--paper-2);
+    box-shadow: 0 12px 26px rgba(43,36,32,0.3), 0 1px 0 rgba(255,255,255,0.5) inset;
+    transform: rotate(var(--r, -2deg));
+  }
+  .photo-corner .art { width: 100%; aspect-ratio: 4/3; }
+  .photo-corner .cap {
+    font-family: var(--font-type);
+    font-size: 0.62rem;
+    letter-spacing: 0.03em;
+    text-align: center;
+    margin-top: 10px;
+    color: var(--ink-soft);
+  }
+
+  .photo-strip {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.2rem;
+    max-width: 320px;
+    margin: 2.6rem auto;
+  }
+  .photo-strip .photo-corner { margin: 0; max-width: none; }
+
+  .voice-insert {
+    max-width: 300px;
+    margin: 3rem auto;
+    padding: 1.6rem;
+    background: var(--paper-2);
+    box-shadow: 0 12px 26px rgba(43,36,32,0.3);
+    display: flex;
+    align-items: center;
+    gap: 1.1rem;
+  }
+  .cassette {
+    flex-shrink: 0;
+    width: 68px;
+    height: 46px;
+    background: var(--ink);
+    border-radius: 4px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 8px;
+  }
+  .reel {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    border: 2px solid var(--paper-3);
+    position: relative;
+  }
+  .reel::before, .reel::after {
+    content: "";
+    position: absolute;
+    background: var(--paper-3);
+  }
+  .reel::before { left: 50%; top: 2px; bottom: 2px; width: 2px; margin-left: -1px; }
+  .reel::after { top: 50%; left: 2px; right: 2px; height: 2px; margin-top: -1px; }
+  .cassette.playing .reel { animation: spin 1.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .voice-meta { flex: 1; min-width: 0; }
+  .voice-label { font-family: var(--font-type); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--seal); margin: 0 0 0.4rem; }
+  .voice-play {
+    background: none;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-family: var(--font-type);
+    font-size: 0.7rem;
+    padding: 0.35rem 0.8rem;
+    border-radius: 2px;
+  }
+  .voice-play:hover { background: rgba(44,43,61,0.06); }
+
+  .voice-script {
+    font-family: var(--font-hand);
+    font-size: 1.15rem;
+    color: var(--ink-soft);
+    line-height: 1.7;
+    margin: 3rem 0;
+  }
+  .voice-script span.word { transition: color 0.15s ease; }
+  .voice-script span.word.active { color: var(--seal); }
+
+  /* ---------- peak: hold to finish the letter ---------- */
+  .peak-block {
+    margin: 4rem 0;
+    text-align: center;
+  }
+  .peak-line {
+    font-size: var(--fs-peak);
+    color: var(--ink);
+    line-height: 1.3;
+    position: relative;
+    display: inline;
+  }
+  .peak-line .reveal-wrap {
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.05s linear;
+  }
+  .peak-line.shown .reveal-wrap { clip-path: inset(0 0% 0 0); }
+  .peak-underline {
+    display: block;
+    margin: 0.6rem auto 0;
+    width: 0;
+    height: 2px;
+    background: var(--seal);
+    transition: width 1s ease 0.2s;
+  }
+  .peak-line.shown ~ .peak-underline,
+  .peak-block.done .peak-underline { width: 40%; }
+
+  .hold-row {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.9rem;
+    margin-top: 1.6rem;
+    transition: opacity 0.6s ease;
   }
-  .scroll-cue .chev { width: 8px; height: 8px; border-right: 1px solid var(--ivory-faint); border-bottom: 1px solid var(--ivory-faint); transform: rotate(45deg); animation: bob 1.8s ease-in-out infinite; }
-  @keyframes bob { 0%,100% { transform: rotate(45deg) translate(0,0); } 50% { transform: rotate(45deg) translate(3px,3px); } }
-
-  /* ---------- name section ---------- */
-  .name-section { background: linear-gradient(180deg, var(--ink) 0%, var(--ink-2) 100%); }
-  .divider {
-    width: 46px;
-    height: 1px;
-    background: var(--hairline);
-    margin: 0 auto 1.8rem;
-    position: relative;
-  }
-  .divider::after {
-    content: "";
-    position: absolute;
-    left: 50%; top: 50%;
-    width: 4px; height: 4px;
-    margin: -2px 0 0 -2px;
+  .hold-row.done { opacity: 0; pointer-events: none; height: 0; margin: 0; overflow: hidden; }
+  .nib-btn {
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    background: var(--marigold);
-  }
-  .section-heading { font-size: var(--fs-lg); margin: 0 0 1.4rem; font-style: italic; }
-  .body-copy { font-size: var(--fs-base); color: var(--ivory-dim); }
-  .body-copy + .body-copy { margin-top: 1.1rem; }
-
-  /* ---------- quotes ---------- */
-  .quotes-section { background: var(--ink-2); }
-  .quote-stack { display: flex; flex-direction: column; gap: 2.6rem; width: 100%; }
-  .quote-item {
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: var(--fs-md);
-    color: var(--ivory);
-    border-left: 1px solid var(--leaf);
-    padding-left: 1.4rem;
-    text-align: left;
-    opacity: 0.5;
-    transform: translateX(-8px);
-    transition: opacity 0.7s ease, transform 0.7s ease;
-  }
-  .quote-item.in-view { opacity: 1; transform: translateX(0); }
-
-  /* ---------- gallery ---------- */
-  .gallery-section { background: linear-gradient(180deg, var(--ink-2) 0%, var(--ink) 100%); }
-  .gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-    gap: 1.4rem;
-    width: 100%;
-    max-width: 64rem;
-  }
-  .keepsake {
-    position: relative;
-    aspect-ratio: 4/5;
-    border-radius: 3px;
-    overflow: hidden;
-    border: 1px solid var(--ink-4);
-    cursor: default;
-    isolation: isolate;
-  }
-  .keepsake .art { position: absolute; inset: 0; transition: transform 0.6s ease; }
-  .keepsake:hover .art { transform: scale(1.06); }
-  .keepsake .caption {
-    position: absolute;
-    left: 0; right: 0; bottom: 0;
-    padding: 1rem 0.9rem 0.85rem;
-    background: linear-gradient(0deg, rgba(18,19,42,0.92) 10%, transparent 100%);
-  }
-  .keepsake .caption h4 {
-    margin: 0 0 0.25rem;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: 1.05rem;
-    color: var(--ivory);
-  }
-  .keepsake .caption p { margin: 0; font-size: 0.82rem; color: var(--ivory-dim); }
-
-  /* ---------- voice note ---------- */
-  .voice-section { background: var(--ink); }
-  .voice-card {
-    border: 1px solid var(--hairline);
-    border-radius: 4px;
-    padding: 2.4rem 1.8rem;
-    background: linear-gradient(160deg, var(--ink-3), var(--ink-2));
-    width: 100%;
-  }
-  .voice-label { font-size: var(--fs-xs); letter-spacing: 0.25em; text-transform: uppercase; color: var(--marigold); margin-bottom: 1.2rem; }
-  .play-row { display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.6rem; }
-  .play-btn {
-    flex-shrink: 0;
-    width: 54px; height: 54px;
-    border-radius: 50%;
-    border: 1px solid var(--marigold-soft);
-    background: transparent;
-    color: var(--ivory);
-    display: flex; align-items: center; justify-content: center;
-    transition: background 0.25s, transform 0.2s;
-  }
-  .play-btn:hover { background: rgba(240,168,58,0.12); }
-  .play-btn:active { transform: scale(0.95); }
-  .play-btn svg { width: 18px; height: 18px; }
-  .waveform { display: flex; align-items: center; gap: 3px; height: 32px; flex: 1; }
-  .waveform .bar {
-    width: 3px;
-    background: var(--ink-4);
-    border-radius: 2px;
-    height: 30%;
-    animation: wave 1.1s ease-in-out infinite;
-    animation-play-state: paused;
-    transition: background 0.3s;
-  }
-  .waveform.playing .bar { background: var(--marigold); animation-play-state: running; }
-  @keyframes wave {
-    0%, 100% { height: 22%; }
-    50% { height: 90%; }
-  }
-  .voice-script { font-size: var(--fs-base); color: var(--ivory-faint); line-height: 1.9; text-align: left; }
-  .voice-script span.word { transition: color 0.15s ease; }
-  .voice-script span.word.active { color: var(--marigold); }
-
-  /* ---------- peak ---------- */
-  .peak-section {
-    background: var(--ink);
-    position: relative;
-  }
-  .hold-wrap { display: flex; flex-direction: column; align-items: center; gap: 1.4rem; transition: opacity 0.8s ease, transform 0.8s ease; }
-  .hold-wrap.done { opacity: 0; transform: scale(0.9); pointer-events: none; position: absolute; }
-  .hold-btn {
-    position: relative;
-    width: 88px; height: 88px;
-    border-radius: 50%;
-    background: transparent;
-    border: none;
-    display: flex; align-items: center; justify-content: center;
+    border: 1.5px solid var(--ink-faint);
+    background: var(--paper);
+    display: flex;
+    align-items: center;
+    justify-content: center;
     touch-action: none;
     -webkit-user-select: none;
     user-select: none;
+    position: relative;
   }
-  .hold-btn svg.ring { position: absolute; inset: 0; transform: rotate(-90deg); }
-  .hold-btn svg.ring circle { fill: none; stroke-width: 2; }
-  .hold-btn svg.ring .track { stroke: var(--ink-4); }
-  .hold-btn svg.ring .fill { stroke: var(--marigold); stroke-linecap: round; transition: stroke-dashoffset 0.05s linear; }
-  .hold-label { font-size: var(--fs-xs); letter-spacing: 0.2em; text-transform: uppercase; color: var(--ivory-faint); }
-  .peak-line {
-    max-width: 40rem;
-    font-family: var(--font-display);
-    font-style: italic;
-    font-size: var(--fs-xl);
-    text-align: center;
-    line-height: 1.25;
-    opacity: 0;
-    transition: opacity 0.4s ease;
+  .nib-btn svg { width: 24px; height: 24px; color: var(--ink); transform: rotate(-40deg); }
+  .nib-progress {
+    position: absolute;
+    inset: -1.5px;
+    border-radius: 50%;
+    background: conic-gradient(var(--seal) calc(var(--p, 0) * 1%), transparent 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
   }
-  .peak-line.shown { opacity: 1; }
-  .peak-line .w {
-    display: inline-block;
-    opacity: 0;
-    transform: translateY(14px);
-    filter: blur(3px);
-    transition: opacity 0.6s ease, transform 0.6s ease, filter 0.6s ease;
-    transition-delay: calc(var(--i) * 90ms);
-  }
-  .peak-line.shown .w { opacity: 1; transform: translateY(0); filter: blur(0); }
+  .hold-label { font-family: var(--font-type); font-size: 0.66rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); }
 
-  /* ---------- closing ---------- */
-  .closing-section { background: linear-gradient(180deg, var(--ink) 0%, var(--ink-3) 100%); text-align: center; }
-  .closing-line { font-family: var(--font-display); font-style: italic; font-size: var(--fs-lg); margin-bottom: 0.6rem; }
-  .closing-sub { color: var(--ivory-dim); margin-bottom: 2.4rem; }
-  .signature { font-family: var(--font-display); font-style: italic; font-size: var(--fs-md); color: var(--marigold-soft); }
-  .footer-note { margin-top: 3.4rem; font-size: var(--fs-xs); letter-spacing: 0.08em; color: var(--ivory-faint); opacity: 0.7; }
+  .signoff { font-size: var(--fs-salut); color: var(--ink); margin: 3.5rem 0 0.3rem; text-align: center; }
+  .signature { font-size: 1.6rem; color: var(--seal); text-align: center; margin: 0 0 3rem; }
+  .footer-note { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.08em; color: var(--ink-faint); text-align: center; margin-bottom: 2.4rem; }
+
+  .reseal-btn {
+    display: block;
+    margin: 0 auto;
+    background: none;
+    border: 1px solid var(--ink-faint);
+    color: var(--ink-soft);
+    font-family: var(--font-type);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    padding: 0.65rem 1.4rem;
+    border-radius: 2px;
+  }
+  .reseal-btn:hover { background: rgba(44,43,61,0.06); }
+
+  /* ---------- resealed outro overlay ---------- */
+  .outro {
+    position: fixed;
+    inset: 0;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1.6rem;
+    background: radial-gradient(ellipse at 50% 45%, var(--desk) 0%, var(--desk-2) 100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 1s ease, visibility 1s;
+  }
+  .outro.shown { opacity: 1; visibility: visible; }
+  .outro-envelope {
+    width: 110px;
+    height: 74px;
+    background: var(--paper);
+    position: relative;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+  }
+  .outro-envelope::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    clip-path: polygon(0 0, 100% 0, 50% 62%);
+    background: var(--paper-2);
+  }
+  .outro-seal {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 30px; height: 30px;
+    margin: -15px 0 0 -15px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, var(--seal-light), var(--seal) 55%, var(--seal-dark) 100%);
+    box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+    z-index: 1;
+  }
+  .outro-line { font-family: var(--font-hand); font-size: 1.5rem; color: #ecdfc0; text-align: center; }
+  .outro-sub { font-family: var(--font-type); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a99a76; }
 
   @media (prefers-reduced-motion: reduce) {
-    .reveal, .quote-item, .peak-line .w, .flame { transition: none !important; animation: none !important; opacity: 1 !important; transform: none !important; filter: none !important; }
+    .reveal, .env-flap, .letter-slideout, .seal-half, .peak-line .reveal-wrap, .peak-underline, .outro {
+      transition: none !important;
+    }
+    .cassette.playing .reel { animation: none !important; }
+    .reveal { opacity: 1 !important; transform: none !important; }
   }
 </style>
 </head>
 <body>
 
-<canvas id="embers"></canvas>
-<div class="vignette"></div>
-<div class="noise"></div>
+<div class="desk-grain"></div>
 
-<div class="progress-thread" aria-hidden="true">
-  <div class="thread-line"></div>
-  <div class="thread-dot" id="threadDot"></div>
+<div class="ribbon-track" aria-hidden="true">
+  <div class="rail"></div>
+  <div class="fill" id="ribbonFill"></div>
+  <div class="tassel" id="ribbonTassel"></div>
 </div>
 
 <button class="sound-toggle" id="soundToggle" aria-label="Mute music" aria-pressed="false">
-  <svg id="soundIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
     <path d="M4 9v6h4l5 5V4L8 9H4z"></path>
-    <path id="wave1" d="M16.5 8.5a5 5 0 0 1 0 7"></path>
-    <path id="wave2" d="M19 6a9 9 0 0 1 0 12"></path>
+    <path d="M16.5 8.5a5 5 0 0 1 0 7"></path>
+    <path d="M19 6a9 9 0 0 1 0 12"></path>
   </svg>
 </button>
 
 <div class="gate" id="gate">
-  <div class="gate-inner">
-    <p class="eyebrow">a letter for</p>
-    <h1 class="gate-name">Chinni</h1>
-    <button class="flame-wrap" id="openGate" aria-label="Light the lamp and begin" style="background:none;border:none;padding:0;display:flex;flex-direction:column;align-items:center;">
-      <span class="flame" id="gateFlame"></span>
-      <span class="lamp-base"></span>
-    </button>
-    <div>
-      <button class="gate-button" id="openGateBtn">Light the lamp</button>
+  <p class="gate-caption">a letter, kept for five years</p>
+  <div class="envelope" id="envelope">
+    <div class="env-body">
+      <div class="env-postmark">16 JUL<br>2026</div>
+      <div class="env-stamp">5</div>
+      <div class="env-address">
+        <p class="to">air mail — deliver by hand</p>
+        <p class="name">Chinni</p>
+        <p class="sub">wherever this finds you</p>
+      </div>
     </div>
-    <p class="gate-hint">best with sound on, and five quiet minutes</p>
+    <div class="letter-slideout" id="letterSlideout"></div>
+    <div class="env-flap" id="envFlap">
+      <div class="env-seal-wrap" id="sealWrap">
+        <span class="seal-half l"></span>
+        <span class="seal-half r"></span>
+        <span class="env-seal-mark">E</span>
+      </div>
+    </div>
+    <button class="gate-btn" id="breakSeal">break the seal</button>
   </div>
 </div>
 
-<main class="main-content" id="mainContent">
+<div class="desk-scroll">
+  <main class="letter-page" id="letterPage" aria-hidden="true">
+    <div class="page-fold f1"></div>
+    <div class="page-fold f2"></div>
 
-  <section id="hero">
-    <div class="measure">
-      <p class="hero-eyebrow reveal" id="heroEyebrow">for Eswari</p>
-      <p class="hero-counter reveal" id="heroCounter">05<span class="unit">years, and counting</span></p>
-      <h2 class="hero-line reveal">Five years in, and you still make ordinary Tuesdays feel worth writing about.</h2>
-      <p class="hero-sub reveal">This is for you, Chinni — an unhurried, honest thank-you for choosing us, every day, for five years running.</p>
+    <div class="letterhead">
+      <div class="postmark-badge">5<br>YEARS</div>
     </div>
-    <div class="scroll-cue"><span>keep going</span><span class="chev"></span></div>
-  </section>
 
-  <section class="name-section" id="nameSection">
-    <div class="measure reveal">
-      <div class="divider"></div>
-      <p class="hero-eyebrow" style="color:var(--ivory-faint)">why I call you</p>
-      <h2 class="section-heading">Chinni</h2>
-      <p class="body-copy">I don't remember the first time it slipped out — somewhere between a bad joke and a good one, your name softened into something only I get to say.</p>
-      <p class="body-copy">Five years later, it still does the same thing it did the very first time: makes the room feel like ours, no matter which room we're in.</p>
+    <p class="salutation reveal">My dearest Chinni,</p>
+
+    <p class="prose reveal">It has been five years since I got the easiest, luckiest yes of my life — and somehow you still make ordinary Tuesdays feel worth writing about. I've been meaning to put this in words for a while. Here it finally is.</p>
+
+    <div class="tucked-note reveal" style="--r:-4deg"><span class="pin"></span><p>"You make patience look like a love language."</p></div>
+
+    <p class="prose reveal">I don't remember the first time "Chinni" slipped out — somewhere between a bad joke and a good one, your name softened into something only I get to say. Five years later, it still does the same thing it did the very first time: makes the room feel like ours, no matter which room we're in.</p>
+
+    <div class="photo-corner reveal" style="--r:3deg">
+      <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(225,168,74,0.55), transparent 60%), radial-gradient(circle at 75% 70%, rgba(80,60,30,0.7), transparent 65%), linear-gradient(40deg, rgba(225,168,74,0.25), rgba(80,60,30,0.85));"></div>
+      <p class="cap">morning coffee, slightly burnt</p>
     </div>
-  </section>
 
-  <section class="quotes-section" id="quotesSection">
-    <div class="measure">
-      <div class="quote-stack">
-        <p class="quote-item reveal">"You make patience look like a love language."</p>
-        <p class="quote-item reveal">"I have never once been bored next to you. That is not a small thing."</p>
-        <p class="quote-item reveal">"Home stopped being a place the day you became it."</p>
-        <p class="quote-item reveal">"Every year with you has felt like the first, and also like I've known you forever. I still don't know how you do that."</p>
+    <div class="tucked-note reveal" style="--r:5deg"><span class="pin"></span><p>"I have never once been bored next to you. That is not a small thing."</p></div>
+
+    <p class="prose soft reveal">Some of what I remember doesn't photograph well — the long drive nowhere we took on a Sunday, lost on purpose; the balcony in the rain with no umbrella, because you said the rain smelled like beginnings and I believed you; the 2 a.m. conversations about nothing, and everything, that always started too late and ended too soon.</p>
+
+    <div class="photo-strip reveal">
+      <div class="photo-corner" style="--r:-3deg">
+        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(126,160,132,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(30,25,45,0.75), transparent 65%), linear-gradient(120deg, rgba(126,160,132,0.2), rgba(30,25,45,0.9));"></div>
+        <p class="cap">the long drive nowhere</p>
+      </div>
+      <div class="photo-corner" style="--r:2deg">
+        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(98,110,180,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(40,30,60,0.8), transparent 65%), linear-gradient(200deg, rgba(98,110,180,0.25), rgba(40,30,60,0.9));"></div>
+        <p class="cap">monsoon, no umbrella</p>
+      </div>
+      <div class="photo-corner" style="--r:4deg">
+        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(226,137,106,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(30,20,50,0.8), transparent 65%), linear-gradient(300deg, rgba(226,137,106,0.25), rgba(30,20,50,0.9));"></div>
+        <p class="cap">2 a.m., still laughing</p>
+      </div>
+      <div class="photo-corner" style="--r:-2deg">
+        <div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(240,168,58,0.5), transparent 60%), radial-gradient(circle at 75% 70%, rgba(40,20,50,0.8), transparent 65%), linear-gradient(160deg, rgba(240,168,58,0.25), rgba(40,20,50,0.9));"></div>
+        <p class="cap">five first anniversaries</p>
       </div>
     </div>
-  </section>
 
-  <section class="gallery-section" id="gallerySection">
-    <div class="measure reveal" style="max-width:64rem;margin-bottom:2.6rem;">
-      <div class="divider"></div>
-      <h2 class="section-heading">A few kept things</h2>
-      <p class="body-copy">Not photographs — just the shapes these moments left behind.</p>
-    </div>
-    <div class="gallery-grid reveal" id="galleryGrid"></div>
-  </section>
+    <div class="tucked-note reveal" style="--r:-3deg"><span class="pin"></span><p>"Home stopped being a place the day you became it."</p></div>
 
-  <section class="voice-section" id="voiceSection">
-    <div class="measure reveal" style="max-width:34rem;">
-      <div class="voice-card">
+    <p class="prose reveal">This is the part I'm bad at saying out loud, so I'm writing it instead: thank you. For staying easy to love on the hard days. For the version of patience only you seem to have. For choosing this — choosing us — five years running.</p>
+
+    <div class="tucked-note reveal" style="--r:4deg"><span class="pin"></span><p>"Every year with you has felt like the first, and also like I've known you forever."</p></div>
+
+    <div class="voice-insert reveal">
+      <div class="cassette" id="cassette">
+        <div class="reel"></div>
+        <div class="reel"></div>
+      </div>
+      <div class="voice-meta">
         <p class="voice-label">a voice note</p>
-        <div class="play-row">
-          <button class="play-btn" id="playVoice" aria-label="Play voice note">
-            <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"></path></svg>
-          </button>
-          <div class="waveform" id="waveform"></div>
-        </div>
-        <p class="voice-script" id="voiceScript"></p>
+        <button class="voice-play" id="playVoice">▸ play</button>
       </div>
     </div>
-  </section>
+    <p class="voice-script reveal" id="voiceScript"></p>
 
-  <section class="peak-section" id="peakSection">
-    <div class="hold-wrap" id="holdWrap">
-      <button class="hold-btn" id="holdBtn" aria-label="Hold to reveal">
-        <svg class="ring" width="88" height="88" viewBox="0 0 88 88">
-          <circle class="track" cx="44" cy="44" r="40"></circle>
-          <circle class="fill" id="holdRing" cx="44" cy="44" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2"></circle>
-        </svg>
-        <span class="flame" style="animation-duration:3.4s;"></span>
-      </button>
-      <p class="hold-label">hold to reveal</p>
+    <div class="peak-block" id="peakBlock">
+      <p class="peak-line" id="peakLine"><span class="reveal-wrap" id="peakWrap"></span></p>
+      <span class="peak-underline"></span>
+      <div class="hold-row" id="holdRow">
+        <button class="nib-btn" id="holdBtn" aria-label="Hold to finish the letter">
+          <span class="nib-progress" id="nibProgress"></span>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.7 3.3a1 1 0 0 0-1.4 0L4 18.6V20h1.4L20.7 4.7a1 1 0 0 0 0-1.4zM3 21l1.5-5L9 20.5z"/></svg>
+        </button>
+        <p class="hold-label">hold to finish the letter</p>
+      </div>
     </div>
-    <p class="peak-line" id="peakLine"></p>
-  </section>
 
-  <section class="closing-section" id="closingSection">
-    <div class="measure reveal">
-      <div class="divider"></div>
-      <p class="closing-line">Happy five years, Chinni.</p>
-      <p class="closing-sub">Here's to the ones we haven't lived yet.</p>
-      <p class="signature">— Always yours, and completely.</p>
-      <p class="footer-note">made with a lot of love, and a little code · 16 July 2026</p>
-    </div>
-  </section>
+    <p class="signoff reveal">Happy five years, Chinni.</p>
+    <p class="signature reveal">Always yours, and completely.</p>
+    <p class="footer-note reveal">written on a quiet evening · 16 July 2026</p>
 
-</main>
+    <button class="reseal-btn" id="resealBtn">fold and seal the letter</button>
+  </main>
+</div>
+
+<div class="outro" id="outro">
+  <div class="outro-envelope"><div class="outro-seal"></div></div>
+  <p class="outro-line">Kept, always.</p>
+  <p class="outro-sub">for Eswari</p>
+</div>
 
 <script>
 (function () {
@@ -582,105 +793,65 @@
   var body = document.body;
   body.classList.add("locked");
 
-  /* ---------------- embers canvas ---------------- */
-  var canvas = document.getElementById("embers");
-  var ctx = canvas.getContext("2d");
-  var W, H, particles = [];
-  var COLORS = ["240,168,58", "226,137,106", "246,239,228"];
+  /* ---------------- music: soft pad + music-box motif ---------------- */
+  var audioCtx = null, master = null, musicOn = false, musicStarted = false, loopTimer = null;
 
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-  window.addEventListener("resize", resize);
-  resize();
-
-  function makeParticle() {
-    return {
-      x: Math.random() * W,
-      y: H + Math.random() * 60,
-      r: 0.8 + Math.random() * 1.8,
-      speed: 0.18 + Math.random() * 0.35,
-      drift: (Math.random() - 0.5) * 0.4,
-      phase: Math.random() * Math.PI * 2,
-      color: COLORS[Math.floor(Math.random() * COLORS.length)],
-      alpha: 0.15 + Math.random() * 0.35
-    };
-  }
-  var COUNT = reduced ? 0 : (window.innerWidth < 640 ? 26 : 46);
-  for (var i = 0; i < COUNT; i++) {
-    var p = makeParticle();
-    p.y = Math.random() * H;
-    particles.push(p);
+  function playNote(freq, time, dur, gainPeak) {
+    var o = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    o.type = "sine";
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(gainPeak, time + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
+    o.connect(g);
+    g.connect(master);
+    o.start(time);
+    o.stop(time + dur + 0.05);
   }
 
-  function tick() {
-    ctx.clearRect(0, 0, W, H);
-    for (var i = 0; i < particles.length; i++) {
-      var p = particles[i];
-      p.y -= p.speed;
-      p.phase += 0.02;
-      p.x += Math.sin(p.phase) * p.drift;
-      if (p.y < -10) { Object.assign(p, makeParticle()); p.y = H + 10; }
-      var flicker = 0.6 + Math.sin(p.phase * 2) * 0.4;
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(" + p.color + "," + (p.alpha * flicker) + ")";
-      ctx.fill();
-    }
-    if (!reduced) requestAnimationFrame(tick);
+  function scheduleMotif() {
+    if (!audioCtx || !musicOn) return;
+    var now = audioCtx.currentTime + 0.1;
+    var notes = [293.66, 349.23, 440.0, 587.33, 440.0, 349.23];
+    notes.forEach(function (f, i) {
+      playNote(f, now + i * 0.5, 1.3, 0.045);
+    });
+    loopTimer = setTimeout(scheduleMotif, 5200);
   }
-  if (!reduced) requestAnimationFrame(tick); else ctx.clearRect(0,0,W,H);
-
-  /* ---------------- ambient music (Web Audio, generative) ---------------- */
-  var audioCtx = null, musicNodes = null, musicOn = false, musicStarted = false;
 
   function startMusic() {
     if (musicStarted) return;
     musicStarted = true;
     try {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      var master = audioCtx.createGain();
+      master = audioCtx.createGain();
       master.gain.value = 0;
       master.connect(audioCtx.destination);
 
-      var freqs = [130.81, 164.81, 196.0, 261.63]; // C3 E3 G3 C4 - warm major triad + octave
-      var lfo = audioCtx.createOscillator();
-      var lfoGain = audioCtx.createGain();
-      lfo.frequency.value = 0.05;
-      lfoGain.gain.value = 300;
-      lfo.connect(lfoGain);
-
-      var filter = audioCtx.createBiquadFilter();
-      filter.type = "lowpass";
-      filter.frequency.value = 900;
-      lfoGain.connect(filter.frequency);
-      filter.connect(master);
-
-      var oscs = freqs.map(function (f, idx) {
+      var padFreqs = [146.83, 220.0];
+      padFreqs.forEach(function (f, idx) {
         var o = audioCtx.createOscillator();
-        o.type = idx % 2 === 0 ? "sine" : "triangle";
+        o.type = "sine";
         o.frequency.value = f;
         var g = audioCtx.createGain();
-        g.gain.value = 0.06 / (idx + 1);
-        var detuneLfo = audioCtx.createOscillator();
-        var detuneGain = audioCtx.createGain();
-        detuneLfo.frequency.value = 0.08 + idx * 0.02;
-        detuneGain.gain.value = 3;
-        detuneLfo.connect(detuneGain);
-        detuneGain.connect(o.detune);
+        g.gain.value = 0.035;
+        var lfo = audioCtx.createOscillator();
+        var lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 0.06 + idx * 0.02;
+        lfoGain.gain.value = 2.5;
+        lfo.connect(lfoGain);
+        lfoGain.connect(o.detune);
         o.connect(g);
-        g.connect(filter);
+        g.connect(master);
         o.start();
-        detuneLfo.start();
-        return o;
+        lfo.start();
       });
-      lfo.start();
 
       var now = audioCtx.currentTime;
-      master.gain.linearRampToValueAtTime(0.5, now + 3.5);
-      musicNodes = { master: master, oscs: oscs, lfo: lfo };
+      master.gain.linearRampToValueAtTime(0.55, now + 2.5);
       musicOn = true;
+      scheduleMotif();
     } catch (e) { /* audio unavailable, fail silently */ }
   }
 
@@ -689,13 +860,15 @@
     if (!audioCtx) return;
     var now = audioCtx.currentTime;
     if (musicOn) {
-      musicNodes.master.gain.cancelScheduledValues(now);
-      musicNodes.master.gain.linearRampToValueAtTime(0, now + 0.6);
+      master.gain.cancelScheduledValues(now);
+      master.gain.linearRampToValueAtTime(0, now + 0.6);
       musicOn = false;
+      if (loopTimer) clearTimeout(loopTimer);
     } else {
-      musicNodes.master.gain.cancelScheduledValues(now);
-      musicNodes.master.gain.linearRampToValueAtTime(0.5, now + 0.6);
+      master.gain.cancelScheduledValues(now);
+      master.gain.linearRampToValueAtTime(0.55, now + 0.6);
       musicOn = true;
+      scheduleMotif();
     }
     updateSoundIcon();
   }
@@ -707,84 +880,61 @@
   }
   soundToggle.addEventListener("click", toggleMusic);
 
-  /* ---------------- gate ---------------- */
+  function chime() {
+    if (!audioCtx) return;
+    playNote(880, audioCtx.currentTime, 1.4, 0.09);
+    playNote(1108.7, audioCtx.currentTime + 0.12, 1.5, 0.06);
+  }
+
+  /* ---------------- envelope gate ---------------- */
   var gate = document.getElementById("gate");
-  function openGate() {
+  var envFlap = document.getElementById("envFlap");
+  var sealWrap = document.getElementById("sealWrap");
+  var breakSealBtn = document.getElementById("breakSeal");
+  var letterPage = document.getElementById("letterPage");
+
+  breakSealBtn.addEventListener("click", function () {
     startMusic();
     updateSoundIcon();
-    gate.classList.add("hidden");
-    body.classList.remove("locked");
-    soundToggle.classList.add("shown");
-    document.getElementById("mainContent").removeAttribute("aria-hidden");
-  }
-  document.getElementById("openGate").addEventListener("click", openGate);
-  document.getElementById("openGateBtn").addEventListener("click", openGate);
+    breakSealBtn.disabled = true;
+    sealWrap.classList.add("cracked");
+    gate.classList.add("opening");
+    setTimeout(function () { envFlap.classList.add("open"); }, 350);
+    setTimeout(function () {
+      gate.classList.add("hidden");
+      body.classList.remove("locked");
+      soundToggle.classList.add("shown");
+      letterPage.removeAttribute("aria-hidden");
+    }, reduced ? 300 : 2100);
+  });
 
-  /* ---------------- scroll reveals + progress thread ---------------- */
-  var revealEls = document.querySelectorAll(".reveal, .quote-item");
+  /* ---------------- scroll reveals + ribbon ---------------- */
+  var revealEls = document.querySelectorAll(".reveal");
   var io = new IntersectionObserver(function (entries) {
     entries.forEach(function (entry) {
       if (entry.isIntersecting) entry.target.classList.add("in-view");
     });
-  }, { threshold: 0.25 });
+  }, { threshold: 0.2 });
   revealEls.forEach(function (el) { io.observe(el); });
 
-  var threadDot = document.getElementById("threadDot");
+  var ribbonFill = document.getElementById("ribbonFill");
+  var ribbonTassel = document.getElementById("ribbonTassel");
   function onScroll() {
     var doc = document.documentElement;
     var scrolled = doc.scrollTop || body.scrollTop;
     var max = (doc.scrollHeight - doc.clientHeight) || 1;
     var pct = Math.min(1, Math.max(0, scrolled / max));
-    threadDot.style.top = (pct * 100) + "%";
+    ribbonFill.style.height = (pct * 100) + "%";
+    ribbonTassel.style.top = (pct * 100) + "%";
   }
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll();
 
-  /* ---------------- hero counter ---------------- */
-  var counted = false;
-  var heroCounter = document.getElementById("heroCounter");
-  var heroIo = new IntersectionObserver(function (entries) {
-    entries.forEach(function (entry) {
-      if (entry.isIntersecting && !counted) {
-        counted = true;
-        var n = 0, target = 5, unit = heroCounter.querySelector(".unit").outerHTML;
-        var step = setInterval(function () {
-          n++;
-          heroCounter.innerHTML = String(n).padStart(2, "0") + unit;
-          if (n >= target) clearInterval(step);
-        }, reduced ? 0 : 260);
-      }
-    });
-  }, { threshold: 0.5 });
-  heroIo.observe(heroCounter);
-
-  /* ---------------- gallery ---------------- */
-  var memories = [
-    { title: "Morning Coffee, Slightly Burnt", note: "You always let it sit too long. I always drink it anyway.", a: "225,168,74", b: "36,40,80", angle: 40 },
-    { title: "The Long Drive Nowhere", note: "We got lost on purpose that Sunday and never told anyone.", a: "126,160,132", b: "26,28,58", angle: 120 },
-    { title: "Monsoon, Balcony, No Umbrella", note: "You said the rain smelled like beginnings. I believed you.", a: "98,110,180", b: "40,30,60", angle: 200 },
-    { title: "2 A.M., Still Laughing", note: "About nothing. About everything. The best talks start too late.", a: "226,137,106", b: "30,20,50", angle: 300 },
-    { title: "The Quiet Sundays", note: "Nothing happened. They're still my favorite ones.", a: "180,150,90", b: "24,26,50", angle: 60 },
-    { title: "Five First Anniversaries", note: "Different cakes, same feeling — lucky, every single time.", a: "240,168,58", b: "40,20,50", angle: 160 }
-  ];
-  var grid = document.getElementById("galleryGrid");
-  memories.forEach(function (m) {
-    var card = document.createElement("div");
-    card.className = "keepsake";
-    card.innerHTML =
-      '<div class="art" style="background: radial-gradient(circle at 30% 30%, rgba(' + m.a + ',0.55), transparent 60%), ' +
-      'radial-gradient(circle at 75% 70%, rgba(' + m.b + ',0.75), transparent 65%), ' +
-      'linear-gradient(' + m.angle + 'deg, rgba(' + m.a + ',0.25), rgba(' + m.b + ',0.9));"></div>' +
-      '<div class="caption"><h4>' + m.title + '</h4><p>' + m.note + '</p></div>';
-    grid.appendChild(card);
-  });
-
-  /* ---------------- voice note ---------------- */
-  var script = "Hey, Chinni. I know reading this whole thing is a lot, so here's the short version, in case you skip everything else: thank you. Thank you for five years of choosing this, choosing us, even on the days it wasn't easy. I love you today the same stubborn way I loved you on day one. Maybe more. Okay, go back to reading. I made you a whole page, don't waste it.";
+  /* ---------------- voice note (cassette) ---------------- */
+  var script = "Hey, Chinni. I know reading this whole letter is a lot, so here's the short version, in case you skip everything else: thank you. Thank you for five years of choosing this, choosing us, even on the days it wasn't easy. I love you today the same stubborn way I loved you on day one. Maybe more. Okay, go back to reading. I wrote you a whole letter, don't waste it.";
   var scriptEl = document.getElementById("voiceScript");
-  var words = script.split(" ");
   var cum = 0;
-  var wordSpans = words.map(function (w) {
+  var wordSpans = script.split(" ").map(function (w) {
     var span = document.createElement("span");
     span.className = "word";
     span.textContent = w;
@@ -795,18 +945,10 @@
     return span;
   });
 
-  var waveform = document.getElementById("waveform");
-  for (var b = 0; b < 24; b++) {
-    var bar = document.createElement("span");
-    bar.className = "bar";
-    bar.style.animationDelay = (Math.random() * 1.1).toFixed(2) + "s";
-    bar.style.animationDuration = (0.8 + Math.random() * 0.8).toFixed(2) + "s";
-    waveform.appendChild(bar);
-  }
-
+  var cassette = document.getElementById("cassette");
   var playBtn = document.getElementById("playVoice");
-  var playIcon = document.getElementById("playIcon");
   var speaking = false;
+
   function setActiveWord(charIndex) {
     var current = null;
     for (var i = 0; i < wordSpans.length; i++) {
@@ -819,102 +961,79 @@
 
   playBtn.addEventListener("click", function () {
     if (!("speechSynthesis" in window)) {
-      scriptEl.style.color = "var(--ivory-dim)";
       wordSpans.forEach(function (s) { s.classList.add("active"); });
       return;
     }
-    if (speaking) {
-      window.speechSynthesis.cancel();
-      return;
-    }
+    if (speaking) { window.speechSynthesis.cancel(); return; }
     window.speechSynthesis.cancel();
     var utter = new SpeechSynthesisUtterance(script);
     utter.rate = 0.95;
-    utter.pitch = 1.0;
     var voices = window.speechSynthesis.getVoices();
     var preferred = voices.find(function (v) { return /en-US|en_GB|en-GB/.test(v.lang) && v.localService; }) || voices[0];
     if (preferred) utter.voice = preferred;
 
     utter.onstart = function () {
       speaking = true;
-      waveform.classList.add("playing");
-      playIcon.innerHTML = '<rect x="6" y="5" width="4" height="14"></rect><rect x="14" y="5" width="4" height="14"></rect>';
+      cassette.classList.add("playing");
+      playBtn.textContent = "❚❚ pause";
     };
     utter.onboundary = function (e) {
-      if (e.name === "word" || e.charIndex !== undefined) setActiveWord(e.charIndex);
+      if (e.charIndex !== undefined) setActiveWord(e.charIndex);
     };
     utter.onend = utter.onerror = function () {
       speaking = false;
-      waveform.classList.remove("playing");
-      playIcon.innerHTML = '<path d="M8 5v14l11-7z"></path>';
+      cassette.classList.remove("playing");
+      playBtn.textContent = "▸ play";
       wordSpans.forEach(function (s) { s.classList.remove("active"); });
     };
     window.speechSynthesis.speak(utter);
   });
 
-  /* ---------------- hold to reveal peak ---------------- */
+  /* ---------------- peak: hold to finish the letter ---------------- */
   var holdBtn = document.getElementById("holdBtn");
-  var holdRing = document.getElementById("holdRing");
-  var holdWrap = document.getElementById("holdWrap");
+  var nibProgress = document.getElementById("nibProgress");
+  var holdRow = document.getElementById("holdRow");
   var peakLine = document.getElementById("peakLine");
-  var peakText = "If I had to choose all over again — every year, every ordinary Tuesday, every hard month — I would choose you. Every single time.";
-  peakText.split(" ").forEach(function (w, i) {
-    var span = document.createElement("span");
-    span.className = "w";
-    span.style.setProperty("--i", i);
-    span.textContent = w + " ";
-    peakLine.appendChild(span);
-  });
+  var peakWrap = document.getElementById("peakWrap");
+  var peakBlock = document.getElementById("peakBlock");
+  peakWrap.textContent = "If I had to choose all over again — every year, every ordinary Tuesday, every hard month — I would choose you. Every single time.";
 
-  var CIRC = 251.2;
   var holding = false, revealed = false, raf = null, startTime = 0;
-  var DURATION = reduced ? 400 : 1600;
+  var DURATION = reduced ? 400 : 2200;
 
-  function chime() {
-    if (!audioCtx) return;
-    var o = audioCtx.createOscillator();
-    var g = audioCtx.createGain();
-    o.type = "sine";
-    o.frequency.value = 880;
-    g.gain.value = 0;
-    o.connect(g);
-    g.connect(audioCtx.destination);
-    var now = audioCtx.currentTime;
-    g.gain.linearRampToValueAtTime(0.12, now + 0.05);
-    g.gain.exponentialRampToValueAtTime(0.0001, now + 1.4);
-    o.start();
-    o.stop(now + 1.5);
-  }
+  function setProgress(p) { nibProgress.style.setProperty("--p", String(p * 100)); }
 
-  function animateRing(ts) {
+  function animate(ts) {
     if (!startTime) startTime = ts;
     var elapsed = ts - startTime;
     var pct = Math.min(1, elapsed / DURATION);
-    holdRing.style.strokeDashoffset = String(CIRC * (1 - pct));
-    if (pct >= 1) {
-      completeReveal();
-      return;
-    }
-    if (holding) raf = requestAnimationFrame(animateRing);
+    setProgress(pct);
+    peakWrap.style.clipPath = "inset(0 " + ((1 - pct) * 100) + "% 0 0)";
+    if (pct >= 1) { complete(); return; }
+    if (holding) raf = requestAnimationFrame(animate);
   }
 
   function springBack() {
-    var current = parseFloat(holdRing.style.strokeDashoffset || CIRC);
     var start = null;
+    var fromClip = peakWrap.style.clipPath;
+    var fromPct = fromClip ? 100 - parseFloat(fromClip.split(" ")[1]) : 0;
     function step(ts) {
       if (!start) start = ts;
-      var t = Math.min(1, (ts - start) / 400);
-      holdRing.style.strokeDashoffset = String(current + (CIRC - current) * t);
+      var t = Math.min(1, (ts - start) / 350);
+      var p = fromPct * (1 - t) / 100;
+      setProgress(p);
+      peakWrap.style.clipPath = "inset(0 " + ((1 - p) * 100) + "% 0 0)";
       if (t < 1) requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
   }
 
-  function completeReveal() {
+  function complete() {
     if (revealed) return;
     revealed = true;
-    holdWrap.classList.add("done");
     peakLine.classList.add("shown");
+    peakBlock.classList.add("done");
+    holdRow.classList.add("done");
     chime();
   }
 
@@ -923,7 +1042,7 @@
     e.preventDefault();
     holding = true;
     startTime = 0;
-    raf = requestAnimationFrame(animateRing);
+    raf = requestAnimationFrame(animate);
   }
   function endHold() {
     if (revealed) return;
@@ -936,9 +1055,16 @@
   holdBtn.addEventListener("pointerleave", endHold);
   holdBtn.addEventListener("pointercancel", endHold);
   holdBtn.addEventListener("keydown", function (e) {
-    if ((e.key === "Enter" || e.key === " ") && !revealed) { e.preventDefault(); completeReveal(); }
+    if ((e.key === "Enter" || e.key === " ") && !revealed) { e.preventDefault(); complete(); }
   });
 
+  /* ---------------- fold and reseal outro ---------------- */
+  var resealBtn = document.getElementById("resealBtn");
+  var outro = document.getElementById("outro");
+  resealBtn.addEventListener("click", function () {
+    outro.classList.add("shown");
+    chime();
+  });
 })();
 </script>
 </body>
