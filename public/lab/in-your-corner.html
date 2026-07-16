@@ -9,8 +9,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Special+Elite&display=swap" rel="stylesheet" />
 <style>
   :root {
-    --desk: #241d18;
-    --desk-2: #17110d;
+    --desk: #f4ede1;
+    --desk-2: #ece3d2;
     --paper: #ecdfc0;
     --paper-2: #e2d1a4;
     --paper-3: #d8c491;
@@ -81,8 +81,8 @@
   }
   .gate.hidden { opacity: 0; visibility: hidden; pointer-events: none; }
   .gate-caption {
-    font-family: var(--font-type); font-size: 0.72rem; letter-spacing: 0.24em;
-    text-transform: uppercase; color: #c9b98a; text-align: center; flex-shrink: 0;
+    font-family: var(--font-type); font-size: 0.68rem; letter-spacing: 0.22em;
+    text-transform: uppercase; color: var(--gold); text-align: center; flex-shrink: 0;
   }
 
   .envelope {
@@ -105,24 +105,31 @@
     -webkit-mask-composite: xor; mask-composite: exclude;
   }
   .env-address {
-    position: absolute; left: 12%; bottom: 18%;
-    font-family: var(--font-type); color: var(--ink);
+    position: absolute; left: 12%; bottom: 16%;
+    color: var(--ink);
   }
-  .env-address .to { font-size: 0.65rem; letter-spacing: 0.18em; color: var(--ink-faint); text-transform: uppercase; margin-bottom: 0.35rem; }
-  .env-address .name { font-size: 1.5rem; }
-  .env-address .sub { font-size: 0.72rem; color: var(--ink-soft); margin-top: 0.2rem; }
+  .env-address .to { font-family: var(--font-hand); font-size: 1.05rem; color: var(--ink-soft); margin: 0 0 0.1rem; }
+  .env-address .name { font-family: var(--font-hand); font-size: 1.85rem; margin: 0 0 0.55rem; }
+  .env-address .sub {
+    font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--ink-faint); line-height: 1.7; margin: 0;
+  }
 
   .env-stamp {
-    position: absolute; top: 10%; right: 9%; width: 46px; height: 56px;
+    position: absolute; top: 10%; right: 9%; width: 50px; height: 60px;
     background: linear-gradient(160deg, var(--paper-2), var(--paper-3));
     box-shadow: 0 0 0 1px var(--paper-shadow) inset, 0 2px 4px rgba(0,0,0,0.2);
     -webkit-mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
     -webkit-mask-size: 8px 8px; -webkit-mask-repeat: round;
     mask-image: radial-gradient(circle 2.6px at 4px 4px, transparent 2.4px, #000 2.6px);
     mask-size: 8px 8px; mask-repeat: round;
-    display: flex; align-items: center; justify-content: center;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;
   }
-  .env-stamp svg { width: 22px; height: 22px; color: var(--postmark); }
+  .env-stamp .stamp-label {
+    font-family: var(--font-type); font-size: 0.38rem; letter-spacing: 0.06em;
+    color: var(--postmark); text-align: center; line-height: 1.2;
+  }
+  .env-stamp .stamp-value { font-family: var(--font-type); font-size: 0.95rem; color: var(--seal); }
   .env-postmark {
     position: absolute; top: 9%; right: 20%; width: 62px; height: 62px;
     border: 1.5px solid var(--postmark); border-radius: 50%; opacity: 0.6;
@@ -153,10 +160,30 @@
     transition: transform 0.2s ease;
   }
   .env-seal-wrap:hover { transform: scale(1.06); }
-  .env-seal-wrap:focus-visible { outline: 2px solid #ecdfc0; outline-offset: 4px; border-radius: 50%; }
+  .env-seal-wrap:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; border-radius: 50%; }
+  .seal-glow {
+    position: absolute; inset: -13px; border-radius: 50%;
+    border: 1px solid rgba(122,31,43,0.22);
+    transition: opacity 0.6s ease;
+  }
+  .seal-glow::before {
+    content: ""; position: absolute; inset: 7px; border-radius: 50%;
+    border: 1px solid rgba(122,31,43,0.14);
+  }
+  .seal-legs {
+    position: absolute; left: 50%; bottom: -8px; width: 26px; height: 10px;
+    margin-left: -13px; pointer-events: none; transition: opacity 0.6s ease;
+  }
+  .seal-legs span {
+    position: absolute; bottom: 0; width: 5px; height: 9px;
+    background: var(--seal-dark); border-radius: 0 0 3px 3px; opacity: 0.85;
+  }
+  .seal-legs span:first-child { left: 4px; }
+  .seal-legs span:last-child { left: 17px; height: 6px; }
+  .env-seal-wrap.cracked .seal-glow, .env-seal-wrap.cracked .seal-legs { opacity: 0; }
   .seal-half {
     position: absolute; inset: 0;
-    border-radius: 46% 54% 61% 39% / 42% 46% 54% 58%;
+    border-radius: 50%;
     background: radial-gradient(circle at 32% 26%, var(--seal-light), var(--seal) 55%, var(--seal-dark) 100%);
     box-shadow: 0 3px 9px rgba(0,0,0,0.45);
     transition: transform 0.7s cubic-bezier(.5,-0.2,.4,1.3), opacity 0.7s ease;
@@ -175,14 +202,14 @@
     position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
     z-index: 1; pointer-events: none;
   }
-  .env-seal-mark svg { width: 26px; height: 26px; color: rgba(236,223,192,0.8); }
+  .env-seal-mark svg { width: 24px; height: 24px; color: rgba(246,239,228,0.85); }
 
   .gate-btn {
-    flex-shrink: 0; background: none; border: 1px solid rgba(236,223,192,0.4); color: #ecdfc0;
+    flex-shrink: 0; background: none; border: 1px solid rgba(44,43,61,0.3); color: var(--ink);
     font-family: var(--font-type); font-size: 0.78rem; letter-spacing: 0.08em;
     padding: 0.7rem 1.6rem; border-radius: 2px; transition: background 0.3s, border-color 0.3s, opacity 0.4s;
   }
-  .gate-btn:hover { background: rgba(236,223,192,0.08); border-color: #ecdfc0; }
+  .gate-btn:hover { background: rgba(44,43,61,0.06); border-color: var(--ink-faint); }
   .gate.opening .gate-btn { opacity: 0; pointer-events: none; }
 
   /* ================= DECK SCENE ================= */
@@ -289,7 +316,7 @@
   .pc-lines span { display: block; height: 1px; background: var(--paper-shadow); opacity: 0.7; }
   .pc-lines span:first-child { width: 70%; }
 
-  .deck-hint { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8a7f63; margin-top: 2.2rem; opacity: 0.8; }
+  .deck-hint { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; color: #8a7f63; margin-top: 2.2rem; opacity: 0.8; transition: opacity 0.6s ease; }
 
   /* ---------- outro: cards gather back into the envelope ---------- */
   .outro {
@@ -316,7 +343,7 @@
   .outro.closing .outro-flap { transform: rotateX(0deg); }
   .outro-seal {
     position: absolute; left: 50%; top: 50%; width: 32px; height: 32px; margin: -16px 0 0 -16px;
-    border-radius: 46% 54% 61% 39% / 42% 46% 54% 58%;
+    border-radius: 50%;
     background: radial-gradient(circle at 32% 26%, var(--seal-light), var(--seal) 55%, var(--seal-dark) 100%);
     box-shadow: 0 3px 6px rgba(0,0,0,0.4);
     z-index: 2; opacity: 0; transform: scale(0.4);
@@ -331,9 +358,9 @@
     transition: top 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1), opacity 0.5s ease;
   }
   .outro.closing .outro-card { top: 40%; opacity: 0; }
-  .outro-line { font-family: var(--font-hand); font-size: 1.5rem; color: #ecdfc0; text-align: center; opacity: 0; transition: opacity 1s ease 2.4s; }
+  .outro-line { font-family: var(--font-hand); font-size: 1.5rem; color: var(--ink); text-align: center; opacity: 0; transition: opacity 1s ease 2.4s; }
   .outro.closing .outro-line { opacity: 1; }
-  .outro-sub { font-family: var(--font-type); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: #a99a76; opacity: 0; transition: opacity 1s ease 2.6s; }
+  .outro-sub { font-family: var(--font-type); font-size: 0.65rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); opacity: 0; transition: opacity 1s ease 2.6s; }
   .outro.closing .outro-sub { opacity: 1; }
 
   @media (prefers-reduced-motion: reduce) {
@@ -356,19 +383,24 @@
 </button>
 
 <div class="gate" id="gate">
-  <p class="gate-caption">a few things I never said out loud</p>
+  <p class="gate-caption">delivered · by hand · no. 001</p>
   <div class="envelope" id="envelope">
     <div class="env-body paper-fiber">
       <div class="env-postmark">16 JUL<br>2026</div>
-      <div class="env-stamp"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4 5.6 20.8 8 13.6 2 9.2h7.6z"/></svg></div>
+      <div class="env-stamp">
+        <span class="stamp-label">GOODWILL</span>
+        <span class="stamp-value">1¢</span>
+      </div>
       <div class="env-address">
-        <p class="to">hand delivered — no rush</p>
-        <p class="name">You</p>
-        <p class="sub">wherever you're standing right now</p>
+        <p class="to">To you,</p>
+        <p class="name">a friend</p>
+        <p class="sub">wherever this reaches you<br>by hand · if possible</p>
       </div>
     </div>
     <div class="env-flap paper-fiber" id="envFlap">
       <div class="env-seal-wrap" id="sealWrap" role="button" tabindex="0" aria-label="Break the wax seal and open the letter">
+        <span class="seal-glow"></span>
+        <span class="seal-legs"><span></span><span></span></span>
         <span class="seal-half l"></span>
         <span class="seal-half r"></span>
         <span class="env-seal-mark"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.35-9.5-9C.7 8.1 2.6 4 6.5 4c2 0 3.4 1.1 4 2.3.6-1.2 2-2.3 4-2.3 3.9 0 5.8 4.1 4 8-2.5 4.65-9.5 9-9.5 9z"/></svg></span>
@@ -510,19 +542,6 @@
     soundToggle.style.opacity = musicOn ? "1" : "0.55";
   }
   soundToggle.addEventListener("click", toggleMusic);
-
-  function flick() {
-    if (!audioCtx) return;
-    var bufferSize = audioCtx.sampleRate * 0.15;
-    var buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    var data = buffer.getChannelData(0);
-    for (var i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
-    var noise = audioCtx.createBufferSource(); noise.buffer = buffer;
-    var filter = audioCtx.createBiquadFilter(); filter.type = "highpass"; filter.frequency.value = 1200;
-    var g = audioCtx.createGain(); g.gain.value = 0.16;
-    noise.connect(filter); filter.connect(g); g.connect(audioCtx.destination);
-    noise.start();
-  }
   function chime() {
     if (!audioCtx) return;
     playNote(880, audioCtx.currentTime, 1.4, 0.09, reverbSend || audioCtx.destination);
@@ -667,7 +686,8 @@
       holdWrap.classList.add("done");
       peakTextEl.classList.add("shown");
       chime();
-      if (deckHint) deckHint.textContent = "tap when you're ready";
+      if (deckHint) deckHint.style.opacity = "0";
+      setTimeout(function () { finishDeck(); }, reduced ? 300 : 3400);
     }
 
     function beginHold(e) {
@@ -748,7 +768,6 @@
     if (peek2) { peek2.classList.remove("slot-peek2"); peek2.classList.add("slot-peek1"); }
 
     addGhost(current);
-    flick();
     current++;
 
     var newDeepIndex = current + 2;
@@ -775,7 +794,6 @@
     if (front) { front.classList.remove("slot-front"); front.classList.add("slot-peek1"); }
 
     removeLastGhost();
-    flick();
     current--;
 
     var el = makeCardEl(current, reduced ? "slot-front" : "gather-in-anim");
@@ -805,7 +823,10 @@
 
   /* ---------------- outro: gather into envelope ---------------- */
   var outro = document.getElementById("outro");
+  var finishing = false;
   function finishDeck() {
+    if (finishing) return;
+    finishing = true;
     var front = stage.querySelector(".slot-front");
     if (front) {
       front.classList.remove("slot-front");
