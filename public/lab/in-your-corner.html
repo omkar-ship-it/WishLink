@@ -223,7 +223,41 @@
   .postcard.slot-peek1 { transform: translate3d(11px,16px,-22px) rotateX(2deg) rotateY(-5deg) rotateZ(3deg) scale(0.94); z-index: 3; filter: brightness(0.92); pointer-events: none; }
   .postcard.slot-peek2 { transform: translate3d(19px,29px,-42px) rotateX(3deg) rotateY(-8deg) rotateZ(6deg) scale(0.88); z-index: 2; filter: brightness(0.82); pointer-events: none; }
   .postcard.slot-peek2-enter { transform: translate3d(24px,36px,-56px) rotateX(4deg) rotateY(-10deg) rotateZ(8deg) scale(0.8); opacity: 0; z-index: 2; pointer-events: none; }
-  .postcard.slot-toss { transform: translate3d(-230px,175px,-260px) rotateX(-16deg) rotateY(400deg) rotateZ(-26deg) scale(0.26); opacity: 0; z-index: 6; pointer-events: none; transition-duration: 0.64s; }
+  @keyframes gatherOut {
+    0%   { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); opacity: 1; }
+    35%  { transform: translate3d(-70px,-50px,-50px) rotateX(-4deg) rotateY(120deg) rotateZ(-10deg) scale(0.75); opacity: 1; }
+    70%  { transform: translate3d(-170px,40px,-150px) rotateX(-10deg) rotateY(280deg) rotateZ(-20deg) scale(0.45); opacity: 0.75; }
+    100% { transform: translate3d(-230px,175px,-260px) rotateX(-16deg) rotateY(420deg) rotateZ(-26deg) scale(0.26); opacity: 0; }
+  }
+  @keyframes gatherIn {
+    0%   { transform: translate3d(-230px,175px,-260px) rotateX(-16deg) rotateY(420deg) rotateZ(-26deg) scale(0.26); opacity: 0; }
+    30%  { transform: translate3d(-170px,40px,-150px) rotateX(-10deg) rotateY(280deg) rotateZ(-20deg) scale(0.45); opacity: 0.75; }
+    65%  { transform: translate3d(-70px,-50px,-50px) rotateX(-4deg) rotateY(120deg) rotateZ(-10deg) scale(0.75); opacity: 1; }
+    100% { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); opacity: 1; }
+  }
+  .postcard.gather-out-anim { animation: gatherOut 0.72s cubic-bezier(.3,.6,.3,1) forwards; z-index: 6; pointer-events: none; }
+  .postcard.gather-in-anim { animation: gatherIn 0.72s cubic-bezier(.3,.6,.3,1) forwards; z-index: 6; pointer-events: none; }
+
+  /* ---------- the belief card: bare stage, hold to reveal ---------- */
+  .pc-message-peak { flex-direction: column; align-items: center; justify-content: center; text-align: center; gap: 1.1rem; }
+  .peak-hold-wrap { display: flex; flex-direction: column; align-items: center; gap: 0.5rem; transition: opacity 0.5s ease; }
+  .peak-hold-wrap.done { opacity: 0; pointer-events: none; height: 0; overflow: hidden; margin: 0; }
+  .peak-hold-btn {
+    width: 54px; height: 54px; border-radius: 50%; border: 1.5px solid var(--ink-faint);
+    background: var(--paper); position: relative; touch-action: none;
+    -webkit-user-select: none; user-select: none; display: flex; align-items: center; justify-content: center;
+  }
+  .peak-hold-ring {
+    position: absolute; inset: -1.5px; border-radius: 50%;
+    background: conic-gradient(var(--seal) calc(var(--p, 0) * 1%), transparent 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+    mask: radial-gradient(farthest-side, transparent calc(100% - 4px), #000 calc(100% - 3px));
+  }
+  .peak-hold-icon { width: 20px; height: 20px; color: var(--ink); transform: rotate(-40deg); }
+  .peak-hold-label { font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink-faint); }
+  .peak-text { font-family: var(--font-hand); font-size: 1.28rem; color: var(--ink); line-height: 1.55; margin: 0; }
+  .peak-reveal-wrap { display: inline; clip-path: inset(0 100% 0 0); transition: clip-path 0.05s linear; }
+  .peak-text.shown .peak-reveal-wrap { clip-path: inset(0 0% 0 0); }
 
   .pc-message {
     flex: 1.35; padding: 1.6rem 1.3rem; display: flex; align-items: center;
@@ -304,6 +338,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .postcard, .env-flap, .seal-half, .outro-flap, .outro-seal, .outro-card, .outro-line, .outro-sub { transition: none !important; }
+    .postcard.gather-out-anim, .postcard.gather-in-anim { animation: none !important; }
   }
 </style>
 </head>
@@ -529,12 +564,7 @@
     {
       img: "/lab/images/postcards/hope.jpg",
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="13" r="4"/><path d="M4 17c0-2 2-3 4-3h8c2 0 4 1 4 3"/></svg>',
-      text: "Hey. I know it's been a heavy stretch, and I didn't want another week to go by without you hearing this straight from me."
-    },
-    {
-      img: "/lab/images/postcards/pride.jpg",
-      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4 5.6 20.8 8 13.6 2 9.2h7.6z"/></svg>',
-      text: "I need you to know — I am proud of you. Not for having it all figured out. For still getting up on the days it would've been so much easier not to."
+      text: "Hey. I won't pretend to know exactly what this stretch has felt like from where you're standing. I just know it's been heavy — and I didn't want another week to pass without you hearing this straight from me."
     },
     {
       img: "/lab/images/postcards/road.jpg",
@@ -545,6 +575,11 @@
       img: "/lab/images/postcards/music.jpg",
       icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M9 18V5l11-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="17" cy="16" r="3"/></svg>',
       text: "Or the world's worst karaoke night, when you sang like nobody was watching — because honestly, nobody should've been. I still think about it and grin."
+    },
+    {
+      img: "/lab/images/postcards/pride.jpg",
+      icon: '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.4 7.2H22l-6 4.4 2.4 7.2L12 16.4 5.6 20.8 8 13.6 2 9.2h7.6z"/></svg>',
+      text: "And through all of it — I need you to know, I am proud of you. Not for having it figured out. For still getting up on the days it would've been so much easier not to."
     },
     {
       img: "/lab/images/postcards/support.jpg",
@@ -560,11 +595,30 @@
 
   var stage = document.getElementById("stage");
   var stackPile = document.getElementById("stackPile");
+  var deckHint = document.querySelector(".deck-hint");
   var current = 0;
+  var beliefRevealed = false;
 
   function cardHTML(i) {
     var c = cards[i];
-    return '<div class="pc-message">' + c.text + '</div>' +
+    var isPeak = i === cards.length - 1;
+    var messageHTML;
+    if (isPeak) {
+      messageHTML =
+        '<div class="pc-message pc-message-peak">' +
+          '<div class="peak-hold-wrap">' +
+            '<button class="peak-hold-btn" type="button" aria-label="Hold to reveal">' +
+              '<span class="peak-hold-ring"></span>' +
+              '<svg class="peak-hold-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M20.7 3.3a1 1 0 0 0-1.4 0L4 18.6V20h1.4L20.7 4.7a1 1 0 0 0 0-1.4zM3 21l1.5-5L9 20.5z"/></svg>' +
+            '</button>' +
+            '<p class="peak-hold-label">hold to reveal</p>' +
+          '</div>' +
+          '<p class="peak-text"><span class="peak-reveal-wrap">' + c.text + '</span></p>' +
+        '</div>';
+    } else {
+      messageHTML = '<div class="pc-message">' + c.text + '</div>';
+    }
+    return messageHTML +
       '<div class="pc-divider"></div>' +
       '<div class="pc-right">' +
         '<img class="pc-photo" src="' + c.img + '" alt="" />' +
@@ -574,10 +628,76 @@
       '</div>';
   }
 
+  function bindPeakHold(cardEl) {
+    var holdBtn = cardEl.querySelector(".peak-hold-btn");
+    var holdRing = cardEl.querySelector(".peak-hold-ring");
+    var holdWrap = cardEl.querySelector(".peak-hold-wrap");
+    var peakTextEl = cardEl.querySelector(".peak-text");
+    if (!holdBtn) return;
+
+    var holding = false, raf = null, startTime = 0;
+    var DURATION = reduced ? 400 : 1700;
+
+    function setProgress(p) { holdRing.style.setProperty("--p", String(p * 100)); }
+
+    function animate(ts) {
+      if (!startTime) startTime = ts;
+      var elapsed = ts - startTime;
+      var pct = Math.min(1, elapsed / DURATION);
+      setProgress(pct);
+      if (pct >= 1) { complete(); return; }
+      if (holding) raf = requestAnimationFrame(animate);
+    }
+
+    function springBack() {
+      var currentPct = parseFloat(holdRing.style.getPropertyValue("--p")) || 0;
+      var start = null;
+      function step(ts) {
+        if (!start) start = ts;
+        var t = Math.min(1, (ts - start) / 350);
+        setProgress(currentPct * (1 - t) / 100);
+        if (t < 1) requestAnimationFrame(step);
+      }
+      requestAnimationFrame(step);
+    }
+
+    function complete() {
+      if (beliefRevealed) return;
+      beliefRevealed = true;
+      holdWrap.classList.add("done");
+      peakTextEl.classList.add("shown");
+      chime();
+      if (deckHint) deckHint.textContent = "tap when you're ready";
+    }
+
+    function beginHold(e) {
+      if (beliefRevealed) return;
+      e.preventDefault();
+      holding = true;
+      startTime = 0;
+      raf = requestAnimationFrame(animate);
+    }
+    function endHold() {
+      if (beliefRevealed) return;
+      holding = false;
+      if (raf) cancelAnimationFrame(raf);
+      springBack();
+    }
+    holdBtn.addEventListener("pointerdown", beginHold);
+    holdBtn.addEventListener("pointerup", endHold);
+    holdBtn.addEventListener("pointerleave", endHold);
+    holdBtn.addEventListener("pointercancel", endHold);
+    holdBtn.addEventListener("click", function (e) { e.stopPropagation(); });
+    holdBtn.addEventListener("keydown", function (e) {
+      if ((e.key === "Enter" || e.key === " ") && !beliefRevealed) { e.preventDefault(); complete(); }
+    });
+  }
+
   function makeCardEl(i, slotClass) {
     var el = document.createElement("div");
     el.className = "postcard " + slotClass;
     el.innerHTML = cardHTML(i);
+    if (i === cards.length - 1) bindPeakHold(el);
     return el;
   }
 
@@ -603,15 +723,26 @@
   }
 
   function goNext() {
-    if (current >= cards.length - 1) { finishDeck(); return; }
+    if (current >= cards.length - 1) {
+      if (!beliefRevealed) return;
+      finishDeck();
+      return;
+    }
     var front = stage.querySelector(".slot-front");
     var peek1 = stage.querySelector(".slot-peek1");
     var peek2 = stage.querySelector(".slot-peek2");
 
     if (front) {
       front.classList.remove("slot-front");
-      front.classList.add("slot-toss");
-      setTimeout(function () { front.remove(); }, 650);
+      if (reduced) {
+        front.remove();
+      } else {
+        front.classList.add("gather-out-anim");
+        front.addEventListener("animationend", function handler() {
+          front.removeEventListener("animationend", handler);
+          front.remove();
+        });
+      }
     }
     if (peek1) { peek1.classList.remove("slot-peek1"); peek1.classList.add("slot-front"); }
     if (peek2) { peek2.classList.remove("slot-peek2"); peek2.classList.add("slot-peek1"); }
@@ -647,14 +778,15 @@
     flick();
     current--;
 
-    var el = makeCardEl(current, "slot-toss");
+    var el = makeCardEl(current, reduced ? "slot-front" : "gather-in-anim");
     stage.appendChild(el);
-    requestAnimationFrame(function () {
-      requestAnimationFrame(function () {
-        el.classList.remove("slot-toss");
+    if (!reduced) {
+      el.addEventListener("animationend", function handler() {
+        el.removeEventListener("animationend", handler);
+        el.classList.remove("gather-in-anim");
         el.classList.add("slot-front");
       });
-    });
+    }
   }
 
   var touchStartX = null;
@@ -675,14 +807,17 @@
   var outro = document.getElementById("outro");
   function finishDeck() {
     var front = stage.querySelector(".slot-front");
-    if (front) { front.classList.remove("slot-front"); front.classList.add("slot-toss"); }
+    if (front) {
+      front.classList.remove("slot-front");
+      if (reduced) { front.remove(); } else { front.classList.add("gather-out-anim"); }
+    }
     setTimeout(function () {
       deckScene.classList.remove("active");
       outro.classList.add("shown");
       requestAnimationFrame(function () {
         setTimeout(function () { outro.classList.add("closing"); chime(); }, 250);
       });
-    }, 520);
+    }, reduced ? 200 : 560);
   }
 })();
 </script>
