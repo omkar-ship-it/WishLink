@@ -240,9 +240,9 @@
   }
   .deck-scene.active { opacity: 1; visibility: visible; }
 
-  .postcard-stage { position: relative; width: min(680px, 94vw); aspect-ratio: 16/10; perspective: 1200px; }
+  .postcard-stage { position: relative; width: min(680px, 94vw); aspect-ratio: 2/1; perspective: 1200px; }
   @media (max-width: 560px) {
-    .postcard-stage { aspect-ratio: 4/3.4; }
+    .postcard-stage { aspect-ratio: 9/10; }
   }
   .postcard {
     position: absolute; inset: 0;
@@ -253,16 +253,20 @@
     border-radius: 2px;
     clip-path: polygon(6px 0, calc(100% - 6px) 0, 100% 6px, 100% calc(100% - 6px), calc(100% - 6px) 100%, 6px 100%, 0 calc(100% - 6px), 0 6px);
     display: flex;
-    padding: 1.3rem 1.5rem;
+    padding: 1.1rem 1.2rem;
     backface-visibility: hidden;
     transition: transform 0.55s cubic-bezier(.3,.6,.3,1), opacity 0.5s ease, filter 0.5s ease;
     will-change: transform;
   }
   .postcard::before {
     content: "";
-    position: absolute; inset: 10px;
+    position: absolute; inset: 8px;
     border: 1px solid rgba(120,90,40,0.16);
     pointer-events: none;
+    z-index: 3;
+  }
+  @media (max-width: 560px) {
+    .postcard { flex-direction: column; padding: 1rem 1.1rem; }
   }
   .postcard.slot-front { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); z-index: 5; filter: brightness(1); }
   .postcard.slot-peek1 { transform: translate3d(14px,18px,-20px) rotateX(1deg) rotateY(-2deg) rotateZ(1deg) scale(0.95); z-index: 3; filter: brightness(0.93); pointer-events: none; }
@@ -286,7 +290,7 @@
   .postcard.gather-in-anim { animation: gatherIn 1.05s cubic-bezier(.45,0,.3,1) forwards; z-index: 6; pointer-events: none; }
 
   .pc-message {
-    flex: 1.6; padding: 0.4rem 1.4rem 0.4rem 0.3rem; display: flex; align-items: flex-start;
+    flex: 1.4; padding: 0.3rem 1.3rem 0.3rem 0.2rem; display: flex; align-items: center;
     font-size: clamp(0.98rem, 2vw, 1.2rem); color: var(--ink); overflow: hidden;
   }
   .pc-message-peak-text {
@@ -294,31 +298,38 @@
     font-family: var(--font-hand); font-size: clamp(1.1rem, 3.2vw, 1.5rem); line-height: 1.5;
     padding: 0.3rem 1.1rem;
   }
-  .pc-divider { width: 1px; background: repeating-linear-gradient(180deg, var(--paper-shadow) 0 6px, transparent 6px 11px); margin: 0.2rem 0; }
-  .pc-right { flex: 0.85; padding: 0.3rem 0.2rem 0.3rem 1.4rem; display: flex; flex-direction: column; gap: 0.6rem; position: relative; }
+  .pc-divider { width: 1px; align-self: stretch; background: repeating-linear-gradient(180deg, var(--paper-shadow) 0 6px, transparent 6px 11px); margin: 0; }
+  .pc-right { flex: 1; position: relative; padding-left: 1.2rem; }
   .pc-photo {
-    width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 2px; display: block;
-    box-shadow: 0 3px 8px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,0,0,0.08);
-    filter: sepia(0.38) saturate(1.05) contrast(1.03) brightness(0.95);
+    width: 100%; height: 100%; object-fit: cover; border-radius: 3px; display: block;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.32), 0 0 0 1px rgba(0,0,0,0.1);
+    filter: sepia(0.3) saturate(1.08) contrast(1.05) brightness(0.97);
   }
   .pc-badge {
-    position: absolute; left: 0.1rem; bottom: 2.6rem; width: 26px; height: 26px; border-radius: 50%;
-    background: var(--paper-2); border: 1px solid var(--paper-shadow); box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    position: absolute; left: 1.6rem; bottom: 0.6rem; width: 28px; height: 28px; border-radius: 50%;
+    background: var(--paper-2); border: 1px solid var(--paper-shadow); box-shadow: 0 2px 6px rgba(0,0,0,0.3);
     display: flex; align-items: center; justify-content: center; color: var(--accent);
+    z-index: 2;
   }
   .pc-badge svg { width: 13px; height: 13px; }
   .pc-stamp {
-    position: absolute; top: 0.15rem; right: 0.05rem; width: 26px; height: 33px;
+    position: absolute; top: 0.6rem; right: 0.4rem; width: 26px; height: 33px;
     background: linear-gradient(160deg, var(--paper-2), var(--paper-3));
     box-shadow: 0 0 0 1px var(--paper-shadow) inset;
     -webkit-mask-image: radial-gradient(circle 1.8px at 3px 3px, transparent 1.6px, #000 1.8px);
     -webkit-mask-size: 5.5px 5.5px; -webkit-mask-repeat: round;
     mask-image: radial-gradient(circle 1.8px at 3px 3px, transparent 1.6px, #000 1.8px);
     mask-size: 5.5px 5.5px; mask-repeat: round;
+    z-index: 2;
   }
-  .pc-lines { display: flex; flex-direction: column; gap: 0.35rem; margin-top: auto; }
-  .pc-lines span { display: block; height: 1px; background: var(--paper-shadow); opacity: 0.7; }
-  .pc-lines span:first-child { width: 70%; }
+  @media (max-width: 560px) {
+    .pc-message { flex: 0.85; padding: 0.2rem 0.2rem 0.5rem; }
+    .pc-message-peak-text { flex: 1; }
+    .pc-divider { display: none; }
+    .pc-right { flex: 1.25; padding-left: 0; padding-top: 0.4rem; }
+    .pc-badge { left: 0.6rem; bottom: 0.6rem; }
+    .pc-stamp { top: 0.5rem; right: 0.5rem; }
+  }
 
   .deck-hint {
     font-family: var(--font-type); font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase;
@@ -608,7 +619,6 @@
         '<img class="pc-photo" src="' + c.img + '" alt="" />' +
         '<div class="pc-stamp"></div>' +
         '<div class="pc-badge">' + c.icon + '</div>' +
-        '<div class="pc-lines"><span></span><span></span></div>' +
       '</div>';
   }
 
