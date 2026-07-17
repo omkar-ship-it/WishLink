@@ -241,17 +241,7 @@
     text-transform: uppercase; color: var(--gold); text-align: center;
     transition: opacity 1s ease, visibility 1s;
   }
-  .gate-btn {
-    position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
-    top: calc(50% + (min(460px, 90vw) / 3) + 1.7rem);
-    background: none; border: 1px solid rgba(44,43,61,0.3); color: var(--ink);
-    font-family: var(--font-body); font-weight: 700; font-size: 0.76rem; letter-spacing: 0.06em;
-    padding: 0.7rem 1.6rem; border-radius: 999px;
-    transition: opacity 1s ease, visibility 1s, background 0.3s, border-color 0.3s;
-  }
-  .gate-btn:hover { background: rgba(44,43,61,0.06); border-color: var(--ink-faint); }
-  .gate.hidden .gate-caption,
-  .gate.hidden .gate-btn {
+  .gate.hidden .gate-caption {
     opacity: 0; visibility: hidden; pointer-events: none;
   }
 
@@ -393,7 +383,7 @@
   .closing-sub { font-family: var(--font-body); font-weight: 700; font-size: 0.64rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--ink-faint); margin: 0; }
 
   @media (prefers-reduced-motion: reduce) {
-    .postcard, .env-flap, .seal-half, .envelope-shell, .gate-caption, .gate-btn, .closing-text {
+    .postcard, .env-flap, .seal-half, .envelope-shell, .gate-caption, .closing-text {
       transition: none !important;
     }
     .postcard.gather-out-anim, .postcard.gather-in-anim,
@@ -443,7 +433,6 @@
 
 <div class="gate" id="gate">
   <p class="gate-caption">a letter, in color · no. 002</p>
-  <button class="gate-btn" id="breakSeal">break the seal</button>
 </div>
 
 <div class="deck-scene" id="deckScene">
@@ -504,26 +493,55 @@
     o2.start(time); o2.stop(time + dur + 0.05);
   }
 
+  function playPad(freq, time, dur, dest) {
+    var o = audioCtx.createOscillator(); o.type = "sine"; o.frequency.value = freq;
+    var lfo = audioCtx.createOscillator(), lfoGain = audioCtx.createGain();
+    lfo.frequency.value = 0.15; lfoGain.gain.value = 1.6;
+    lfo.connect(lfoGain); lfoGain.connect(o.detune);
+    var g = audioCtx.createGain();
+    g.gain.setValueAtTime(0, time);
+    g.gain.linearRampToValueAtTime(0.05, time + dur * 0.35);
+    g.gain.setValueAtTime(0.05, time + dur * 0.6);
+    g.gain.linearRampToValueAtTime(0, time + dur);
+    o.connect(g); g.connect(dest);
+    o.start(time); lfo.start(time);
+    o.stop(time + dur + 0.1); lfo.stop(time + dur + 0.1);
+  }
+
+  var chords = [
+    [293.66, 369.99, 440.0, 587.33],  // D major
+    [246.94, 293.66, 369.99, 493.88], // B minor
+    [196.0, 246.94, 293.66, 392.0],   // G major
+    [220.0, 277.18, 329.63, 440.0]    // A major
+  ];
+  var padRoots = [
+    [146.83, 220.0],  // D pad: root + fifth
+    [123.47, 185.0],  // Bm pad: root + fifth
+    [98.0, 146.83],   // G pad: root + fifth
+    [110.0, 164.81]   // A pad: root + fifth
+  ];
+
   function scheduleMotif() {
     if (!audioCtx || !musicOn) return;
     var now = audioCtx.currentTime + 0.08;
-    var chords = [
-      [293.66, 369.99, 440.0, 587.33],  // D major
-      [246.94, 293.66, 369.99, 493.88], // B minor
-      [196.0, 246.94, 293.66, 392.0],   // G major
-      [220.0, 277.18, 329.63, 440.0]    // A major
-    ];
     var step = 0.46;
     var chord = chords[chordIdx % chords.length];
-    chord.forEach(function (f, i) {
-      var peak = i === chord.length - 1 ? 0.05 : 0.036;
+    var pad = padRoots[chordIdx % padRoots.length];
+    var chordDur = chord.length * step;
+
+    pad.forEach(function (f) { playPad(f, now, chordDur * 1.2, reverbSend); });
+
+    var ascending = chordIdx % 2 === 0;
+    var notes = ascending ? chord : chord.slice().reverse();
+    notes.forEach(function (f, i) {
+      var peak = i === notes.length - 1 ? 0.05 : 0.036;
       playNote(f, now + i * step, step * 1.9, peak, reverbSend);
     });
     if (chordIdx % 2 === 1) {
-      playNote(chord[0] * 2, now + chord.length * step * 0.5, step * 2.4, 0.02, reverbSend);
+      playNote(chord[0] * 2, now + chordDur * 0.5, step * 2.4, 0.02, reverbSend);
     }
     chordIdx++;
-    loopTimer = setTimeout(scheduleMotif, chord.length * step * 1000);
+    loopTimer = setTimeout(scheduleMotif, chordDur * 1000);
   }
 
   function startMusic() {
@@ -541,14 +559,12 @@
       reverbSend.connect(convolver);
       reverbSend.connect(master);
 
-      [146.83, 220.0, 185.0].forEach(function (f, idx) {
-        var o = audioCtx.createOscillator(); o.type = idx === 2 ? "triangle" : "sine"; o.frequency.value = f;
-        var g = audioCtx.createGain(); g.gain.value = idx === 2 ? 0.013 : 0.028;
-        var lfo = audioCtx.createOscillator(), lfoGain = audioCtx.createGain();
-        lfo.frequency.value = 0.05 + idx * 0.017; lfoGain.gain.value = 2.2;
-        lfo.connect(lfoGain); lfoGain.connect(o.detune);
-        o.connect(g); g.connect(master); o.start(); lfo.start();
-      });
+      var bass = audioCtx.createOscillator(); bass.type = "sine"; bass.frequency.value = 73.42;
+      var bassGain = audioCtx.createGain(); bassGain.gain.value = 0.022;
+      var bassLfo = audioCtx.createOscillator(), bassLfoGain = audioCtx.createGain();
+      bassLfo.frequency.value = 0.04; bassLfoGain.gain.value = 1.4;
+      bassLfo.connect(bassLfoGain); bassLfoGain.connect(bass.detune);
+      bass.connect(bassGain); bassGain.connect(master); bass.start(); bassLfo.start();
 
       var bufferSize = audioCtx.sampleRate * 2;
       var noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
@@ -634,7 +650,6 @@
   var envelopeShell = document.getElementById("envelopeShell");
   var envFlap = document.getElementById("envFlap");
   var sealWrap = document.getElementById("sealWrap");
-  var breakSealBtn = document.getElementById("breakSeal");
   var deckScene = document.getElementById("deckScene");
   var deckHint = document.getElementById("deckHint");
   var closingText = document.getElementById("closingText");
@@ -644,7 +659,6 @@
     if (opened) return;
     opened = true;
     startMusic(); updateSoundIcon();
-    breakSealBtn.disabled = true;
     sealWrap.classList.add("cracked");
     setTimeout(function () { envFlap.classList.add("open"); }, 350);
     setTimeout(function () {
@@ -657,7 +671,6 @@
       initStack();
     }, reduced ? 300 : 2100);
   }
-  breakSealBtn.addEventListener("click", openEnvelope);
   sealWrap.addEventListener("click", openEnvelope);
   sealWrap.addEventListener("keydown", function (e) {
     if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openEnvelope(); }
@@ -670,35 +683,35 @@
   var cards = [
     {
       color: "var(--c-steady)",
-      eyebrow: "Scene One · Steady",
+      eyebrow: "Steady",
       img: "/lab/images/incolor/steady.jpg",
       quote: "You make hard days feel survivable.",
       desc: "You show up, every single day, and call it nothing."
     },
     {
       color: "var(--c-small)",
-      eyebrow: "Scene Two · The Small Things",
+      eyebrow: "The Small Things",
       img: "/lab/images/incolor/smallthings.jpg",
       quote: "It's the Tuesday mornings, not the big days.",
       desc: "The coffee you make without asking. I notice everything."
     },
     {
       color: "var(--c-showsup)",
-      eyebrow: "Scene Three · You Showed Up",
+      eyebrow: "You Showed Up",
       img: "/lab/images/incolor/showsup.jpg",
       quote: "You never made me feel like a burden.",
       desc: "You didn't fix it. You just stayed. That was enough."
     },
     {
       color: "var(--c-laughter)",
-      eyebrow: "Scene Four · The Laughter",
+      eyebrow: "The Laughter",
       img: "/lab/images/incolor/laughter.jpg",
       quote: "Still the funniest person I know.",
       desc: "You can make me laugh so hard I can't breathe."
     },
     {
       color: "var(--c-growth)",
-      eyebrow: "Scene Five · Who I Became",
+      eyebrow: "Who I Became",
       img: "/lab/images/incolor/growth.jpg",
       quote: "I like who I am when I'm with you.",
       desc: "You made room for me to grow braver. Quietest gift there is."
