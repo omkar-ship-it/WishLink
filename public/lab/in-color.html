@@ -124,26 +124,26 @@
     box-shadow: 0 30px 70px rgba(90,30,10,0.45), 0 10px 22px -6px rgba(90,30,10,0.4), 0 1px 0 rgba(255,255,255,0.4) inset, inset 0 0 0 1px rgba(90,30,10,0.16);
   }
   .env-tape {
-    position: absolute; top: -13px; left: 20%; width: 92px; height: 32px;
+    position: absolute; top: -9px; left: 22%; width: 68px; height: 24px;
     background: repeating-linear-gradient(45deg, var(--tape), var(--tape) 7px, var(--tape-2) 7px, var(--tape-2) 14px);
-    opacity: 0.92; transform: rotate(-7deg);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.18);
+    opacity: 0.78; transform: rotate(-6deg);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.15);
     transition: opacity 0.4s ease;
     z-index: 5;
   }
   .env-address {
-    position: absolute; left: 12%; bottom: 16%; right: 26%;
-    padding: 0.5rem 0.7rem; border-radius: 8px;
-    background: rgba(45,15,5,0.3);
+    position: absolute; left: 8%; bottom: 9%; width: 30%;
+    padding: 0.4rem 0.55rem; border-radius: 7px;
+    background: rgba(45,15,5,0.32);
     color: #fff;
     text-shadow: 0 1px 3px rgba(40,10,0,0.4);
     transition: opacity 0.4s ease;
   }
-  .env-address .to { font-family: var(--font-hand); font-size: 1.1rem; color: rgba(255,255,255,0.88); margin: 0 0 0.1rem; }
-  .env-address .name { font-family: var(--font-hand); font-size: 1.9rem; margin: 0 0 0.55rem; }
+  .env-address .to { font-family: var(--font-hand); font-size: 0.85rem; color: rgba(255,255,255,0.88); margin: 0 0 0.05rem; }
+  .env-address .name { font-family: var(--font-hand); font-size: 1.3rem; line-height: 1.05; margin: 0 0 0.35rem; }
   .env-address .sub {
-    font-family: var(--font-body); font-weight: 600; font-size: 0.56rem; letter-spacing: 0.1em;
-    text-transform: uppercase; color: rgba(255,255,255,0.8); line-height: 1.7; margin: 0;
+    font-family: var(--font-body); font-weight: 600; font-size: 0.44rem; letter-spacing: 0.08em;
+    text-transform: uppercase; color: rgba(255,255,255,0.8); line-height: 1.5; margin: 0;
   }
 
   .env-stamp {
@@ -157,6 +157,7 @@
     mask-size: 8px 8px; mask-repeat: round;
     display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.2rem;
     transition: opacity 0.4s ease;
+    z-index: 5;
   }
   .env-stamp .stamp-label {
     font-family: var(--font-body); font-weight: 700; font-size: 0.44rem; letter-spacing: 0.03em;
@@ -263,18 +264,23 @@
   }
   .deck-scene.active { opacity: 1; visibility: visible; }
 
-  .postcard-stage { position: relative; width: min(420px, 86vw); aspect-ratio: 4/6; perspective: 1200px; }
+  .postcard-stage { position: relative; width: min(520px, 92vw); aspect-ratio: 3/2; perspective: 1200px; }
   .postcard {
     position: absolute; inset: 0;
     --tx: -180px; --ty: 260px;
-    background: var(--c-peak);
+    background: var(--desk);
     border-radius: 10px;
     overflow: hidden;
     box-shadow: 0 20px 44px rgba(40,20,10,0.28), 0 2px 6px rgba(0,0,0,0.14), 0 0 0 1px rgba(255,255,255,0.5) inset;
-    display: flex; flex-direction: column;
+    display: flex; flex-direction: row;
+    padding: 0.9rem 1rem;
     backface-visibility: hidden;
     transition: transform 0.55s cubic-bezier(.3,.6,.3,1), opacity 0.5s ease, filter 0.5s ease;
     will-change: transform;
+  }
+  .postcard:has(.pc-peak) { padding: 0; }
+  @media (max-width: 560px) {
+    .postcard { padding: 0.8rem 0.85rem; }
   }
   .postcard.slot-front { transform: translate3d(0,0,0) rotateX(0deg) rotateY(0deg) rotateZ(0deg) scale(1); z-index: 5; filter: brightness(1); }
   .postcard.slot-peek1 { transform: translate3d(14px,18px,-20px) rotateX(1deg) rotateY(-2deg) rotateZ(1deg) scale(0.95); z-index: 3; filter: brightness(0.93); pointer-events: none; }
@@ -297,33 +303,37 @@
   .postcard.gather-out-anim { animation: gatherOut 1.05s cubic-bezier(.45,0,.3,1) forwards; z-index: 6; pointer-events: none; }
   .postcard.gather-in-anim { animation: gatherIn 1.05s cubic-bezier(.45,0,.3,1) forwards; z-index: 6; pointer-events: none; }
 
-  .pc-photo-wrap { flex: 1.2; position: relative; overflow: hidden; }
+  .pc-photo-wrap { flex: 1.1; position: relative; overflow: hidden; border-radius: 8px; }
   .pc-bg {
     position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; display: block;
   }
-  .pc-scrim {
-    position: absolute; inset: 0;
-    background: linear-gradient(0deg, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.1) 45%, transparent 70%),
-                linear-gradient(180deg, color-mix(in srgb, var(--scene) 35%, transparent) 0%, transparent 40%);
+  .pc-accent {
+    flex: none; width: 3px; align-self: stretch; margin: 0 0.9rem;
+    border-radius: 2px; background: var(--scene);
   }
   .pc-content {
-    flex: 1; position: relative; padding: 0.9rem 1.1rem 1rem; display: flex; flex-direction: column;
-    background: var(--desk);
+    flex: 1; position: relative; display: flex; flex-direction: column; justify-content: center;
+    overflow: hidden;
+  }
+  @media (max-width: 560px) {
+    .pc-photo-wrap { flex: 0.85; }
+    .pc-content { flex: 1.15; }
+    .pc-accent { margin: 0 0.65rem; }
   }
   .pc-eyebrow {
-    font-family: var(--font-body); font-weight: 800; font-size: 0.62rem; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--scene); margin: 0 0 0.35rem;
+    font-family: var(--font-body); font-weight: 800; font-size: 0.6rem; letter-spacing: 0.1em;
+    text-transform: uppercase; color: var(--scene); margin: 0 0 0.3rem;
   }
   .pc-quote {
-    font-family: var(--font-hand); font-weight: 700; font-size: clamp(1.1rem, 3.6vw, 1.35rem); line-height: 1.28;
-    color: var(--ink); margin: 0 0 0.4rem; overflow: hidden;
+    font-family: var(--font-hand); font-weight: 700; font-size: clamp(1.05rem, 3.2vw, 1.3rem); line-height: 1.26;
+    color: var(--ink); margin: 0 0 0.35rem; overflow: hidden;
   }
   .pc-desc {
-    font-family: var(--font-body); font-size: clamp(0.8rem, 2.1vw, 0.92rem); line-height: 1.5;
+    font-family: var(--font-body); font-size: clamp(0.78rem, 1.9vw, 0.9rem); line-height: 1.46;
     color: var(--ink-soft); margin: 0; overflow: hidden;
   }
   .pc-voice {
-    margin-top: auto; align-self: flex-start;
+    margin-top: 0.6rem; align-self: flex-start;
     display: inline-flex; align-items: center; gap: 0.45rem;
     background: color-mix(in srgb, var(--scene) 14%, var(--desk)); border: 1px solid color-mix(in srgb, var(--scene) 45%, transparent);
     border-radius: 999px; padding: 0.35rem 0.75rem 0.35rem 0.6rem;
@@ -426,7 +436,7 @@
       <div class="env-address">
         <p class="to">To you,</p>
         <p class="name">my favorite person</p>
-        <p class="sub">however this finds you<br>with everything I've got</p>
+        <p class="sub">with everything I've got</p>
       </div>
     </div>
     <div class="env-flap paper-fiber" id="envFlap"></div>
@@ -657,40 +667,40 @@
       color: "var(--c-steady)",
       eyebrow: "Scene One · Steady",
       img: "/lab/images/incolor/steady.jpg",
-      quote: "You make the hard days feel survivable.",
-      desc: "Everyone else sees confidence. I see someone who shows up anyway, every single day, and calls it nothing."
+      quote: "You make hard days feel survivable.",
+      desc: "You show up, every single day, and call it nothing."
     },
     {
       color: "var(--c-small)",
       eyebrow: "Scene Two · The Small Things",
       img: "/lab/images/incolor/smallthings.jpg",
-      quote: "It's never the big days. It's the Tuesday mornings.",
-      desc: "The coffee you make without asking. The songs you hum off-key. I notice everything, and none of it is small to me."
+      quote: "It's the Tuesday mornings, not the big days.",
+      desc: "The coffee you make without asking. I notice everything."
     },
     {
       color: "var(--c-showsup)",
       eyebrow: "Scene Three · You Showed Up",
       img: "/lab/images/incolor/showsup.jpg",
-      quote: "You never once made me feel like a burden.",
-      desc: "On the nights I fell apart, you didn't try to fix it. You just stayed. That was always enough."
+      quote: "You never made me feel like a burden.",
+      desc: "You didn't fix it. You just stayed. That was enough."
     },
     {
       color: "var(--c-laughter)",
       eyebrow: "Scene Four · The Laughter",
       img: "/lab/images/incolor/laughter.jpg",
-      quote: "You are, annoyingly, still the funniest person I know.",
-      desc: "Years in, and you can still make me laugh so hard I can't breathe. I hope that never gets old."
+      quote: "Still the funniest person I know.",
+      desc: "You can make me laugh so hard I can't breathe."
     },
     {
       color: "var(--c-growth)",
       eyebrow: "Scene Five · Who I Became",
       img: "/lab/images/incolor/growth.jpg",
       quote: "I like who I am when I'm with you.",
-      desc: "You made room for me to grow into someone braver. That's the quietest gift, and the biggest one."
+      desc: "You made room for me to grow braver. Quietest gift there is."
     },
     {
       color: "var(--c-peak)",
-      quote: "Every year, every version of us — I'd choose you again. Every single time."
+      quote: "Every year, every version of us — I'd choose you again."
     }
   ];
 
@@ -733,8 +743,8 @@
     }
     return '<div class="pc-photo-wrap">' +
         '<img class="pc-bg" src="' + c.img + '" alt="" />' +
-        '<div class="pc-scrim" style="--scene:' + c.color + '"></div>' +
       '</div>' +
+      '<div class="pc-accent" style="--scene:' + c.color + '"></div>' +
       '<div class="pc-content">' +
         '<p class="pc-eyebrow" style="--scene:' + c.color + '">' + c.eyebrow + '</p>' +
         '<p class="pc-quote">' + c.quote + '</p>' +
