@@ -81,7 +81,7 @@
   /* ================= PERSISTENT ENVELOPE ================= */
   .envelope-shell {
     position: fixed; z-index: 45;
-    width: min(380px, 84vw); aspect-ratio: 3 / 2;
+    width: min(460px, 90vw); aspect-ratio: 3 / 2;
     top: 50%; left: 50%; transform: translate(-50%, -50%);
     transition: top 1.15s cubic-bezier(.4,0,.2,1), left 1.15s cubic-bezier(.4,0,.2,1), width 1.15s cubic-bezier(.4,0,.2,1);
     perspective: 1600px;
@@ -236,14 +236,14 @@
   /* ================= GATE CHROME ================= */
   .gate-caption {
     position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
-    top: calc(50% - (min(380px, 84vw) / 3) - 2.9rem);
+    top: calc(50% - (min(460px, 90vw) / 3) - 2.9rem);
     font-family: var(--font-body); font-weight: 700; font-size: 0.66rem; letter-spacing: 0.2em;
     text-transform: uppercase; color: var(--gold); text-align: center;
     transition: opacity 1s ease, visibility 1s;
   }
   .gate-btn {
     position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
-    top: calc(50% + (min(380px, 84vw) / 3) + 1.7rem);
+    top: calc(50% + (min(460px, 90vw) / 3) + 1.7rem);
     background: none; border: 1px solid rgba(44,43,61,0.3); color: var(--ink);
     font-family: var(--font-body); font-weight: 700; font-size: 0.76rem; letter-spacing: 0.06em;
     padding: 0.7rem 1.6rem; border-radius: 999px;
@@ -385,7 +385,7 @@
   /* ---------- closing text ---------- */
   .closing-text {
     position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
-    top: calc(50% + (min(380px, 84vw) / 3) + 2rem);
+    top: calc(50% + (min(460px, 90vw) / 3) + 2rem);
     text-align: center; opacity: 0; transition: opacity 1s ease; pointer-events: none;
   }
   .closing-text.shown { opacity: 1; }
@@ -467,8 +467,8 @@
   var body = document.body;
   body.classList.add("locked");
 
-  /* ---------------- music: layered pad + evolving music-box motif + reverb ---------------- */
-  var audioCtx = null, master = null, reverbSend = null, musicOn = false, musicStarted = false, loopTimer = null, phraseToggle = 0;
+  /* ---------------- music: layered pad + continuous chord-arpeggio + reverb ---------------- */
+  var audioCtx = null, master = null, reverbSend = null, musicOn = false, musicStarted = false, loopTimer = null, chordIdx = 0;
 
   function makeImpulse(ctx, seconds, decay) {
     var rate = ctx.sampleRate;
@@ -485,15 +485,20 @@
 
   function playNote(freq, time, dur, peak, dest) {
     var o1 = audioCtx.createOscillator(), o2 = audioCtx.createOscillator();
+    var filt = audioCtx.createBiquadFilter();
+    filt.type = "lowpass"; filt.Q.value = 0.6;
+    filt.frequency.setValueAtTime(freq * 5.5, time);
+    filt.frequency.exponentialRampToValueAtTime(freq * 1.4, time + dur * 0.85);
     var g = audioCtx.createGain();
     o1.type = "sine"; o1.frequency.value = freq;
-    o2.type = "sine"; o2.frequency.value = freq * 2.01;
-    var g2 = audioCtx.createGain(); g2.gain.value = 0.16;
+    o2.type = "triangle"; o2.frequency.value = freq * 2.0;
+    var g2 = audioCtx.createGain(); g2.gain.value = 0.14;
     g.gain.setValueAtTime(0, time);
-    g.gain.linearRampToValueAtTime(peak, time + 0.02);
+    g.gain.linearRampToValueAtTime(peak, time + 0.025);
     g.gain.exponentialRampToValueAtTime(0.0001, time + dur);
-    o1.connect(g);
-    o2.connect(g2); g2.connect(g);
+    o1.connect(filt);
+    o2.connect(g2); g2.connect(filt);
+    filt.connect(g);
     g.connect(dest);
     o1.start(time); o1.stop(time + dur + 0.05);
     o2.start(time); o2.stop(time + dur + 0.05);
@@ -501,13 +506,24 @@
 
   function scheduleMotif() {
     if (!audioCtx || !musicOn) return;
-    var now = audioCtx.currentTime + 0.1;
-    var phraseA = [293.66, 349.23, 440.0, 587.33, 440.0, 349.23];
-    var phraseB = [329.63, 392.0, 493.88, 392.0, 329.63, 261.63];
-    var notes = phraseToggle % 2 === 0 ? phraseA : phraseB;
-    phraseToggle++;
-    notes.forEach(function (f, i) { playNote(f, now + i * 0.5, 1.4, 0.04, reverbSend); });
-    loopTimer = setTimeout(scheduleMotif, 5200);
+    var now = audioCtx.currentTime + 0.08;
+    var chords = [
+      [293.66, 369.99, 440.0, 587.33],  // D major
+      [246.94, 293.66, 369.99, 493.88], // B minor
+      [196.0, 246.94, 293.66, 392.0],   // G major
+      [220.0, 277.18, 329.63, 440.0]    // A major
+    ];
+    var step = 0.46;
+    var chord = chords[chordIdx % chords.length];
+    chord.forEach(function (f, i) {
+      var peak = i === chord.length - 1 ? 0.05 : 0.036;
+      playNote(f, now + i * step, step * 1.9, peak, reverbSend);
+    });
+    if (chordIdx % 2 === 1) {
+      playNote(chord[0] * 2, now + chord.length * step * 0.5, step * 2.4, 0.02, reverbSend);
+    }
+    chordIdx++;
+    loopTimer = setTimeout(scheduleMotif, chord.length * step * 1000);
   }
 
   function startMusic() {
@@ -518,8 +534,8 @@
       master = audioCtx.createGain(); master.gain.value = 0; master.connect(audioCtx.destination);
 
       var convolver = audioCtx.createConvolver();
-      convolver.buffer = makeImpulse(audioCtx, 2.2, 2.2);
-      var wetGain = audioCtx.createGain(); wetGain.gain.value = 0.5;
+      convolver.buffer = makeImpulse(audioCtx, 2.6, 2.0);
+      var wetGain = audioCtx.createGain(); wetGain.gain.value = 0.56;
       convolver.connect(wetGain); wetGain.connect(master);
       reverbSend = audioCtx.createGain(); reverbSend.gain.value = 1;
       reverbSend.connect(convolver);
