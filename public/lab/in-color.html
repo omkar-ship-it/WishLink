@@ -382,15 +382,6 @@
     color: #9c8776; margin-top: 1.4rem; opacity: 0.8; transition: opacity 0.6s ease;
   }
 
-  .scene-track {
-    display: flex; gap: 0.4rem; margin-top: 0.9rem;
-  }
-  .scene-dot {
-    width: 6px; height: 6px; border-radius: 50%; background: rgba(90,60,40,0.22);
-    transition: background 0.3s, transform 0.3s;
-  }
-  .scene-dot.done { background: var(--dot-color, var(--gold)); transform: scale(1.15); }
-
   /* ---------- closing text ---------- */
   .closing-text {
     position: fixed; z-index: 44; left: 50%; transform: translateX(-50%);
@@ -458,7 +449,6 @@
 <div class="deck-scene" id="deckScene">
   <div class="postcard-stage" id="stage"></div>
   <p class="deck-hint" id="deckHint">tap or swipe to continue</p>
-  <div class="scene-track" id="sceneTrack"></div>
 </div>
 
 <div class="closing-text" id="closingText">
@@ -632,7 +622,6 @@
   var deckScene = document.getElementById("deckScene");
   var deckHint = document.getElementById("deckHint");
   var closingText = document.getElementById("closingText");
-  var sceneTrack = document.getElementById("sceneTrack");
   var opened = false;
 
   function openEnvelope() {
@@ -707,22 +696,6 @@
   var stage = document.getElementById("stage");
   var current = 0;
 
-  cards.forEach(function (c, i) {
-    if (i === cards.length - 1) return;
-    var dot = document.createElement("span");
-    dot.className = "scene-dot";
-    dot.style.setProperty("--dot-color", c.color);
-    dot.dataset.idx = String(i);
-    sceneTrack.appendChild(dot);
-  });
-  function updateSceneTrack() {
-    var dots = sceneTrack.children;
-    for (var i = 0; i < dots.length; i++) {
-      dots[i].classList.toggle("done", i <= current && current < cards.length - 1);
-    }
-    sceneTrack.style.opacity = current >= cards.length - 1 ? "0" : "1";
-  }
-
   function voiceHTML(idx, color) {
     return '<button class="pc-voice" data-idx="' + idx + '" style="--scene:' + color + '" aria-label="Play voice note">' +
       '<span class="pc-voice-icon-play">' + PLAY_SVG + '</span>' +
@@ -766,7 +739,6 @@
     stage.appendChild(front);
     if (cards.length > 1) stage.appendChild(makeCardEl(1, "slot-peek1"));
     if (cards.length > 2) stage.appendChild(makeCardEl(2, "slot-peek2"));
-    updateSceneTrack();
   }
 
   function applyFlyVars(el) {
@@ -793,7 +765,6 @@
     if (peakTimer) { clearTimeout(peakTimer); peakTimer = null; }
     var atPeak = current === cards.length - 1;
     if (deckHint) deckHint.style.opacity = atPeak ? "0" : "0.8";
-    updateSceneTrack();
     if (atPeak) {
       peakTimer = setTimeout(finishDeck, reduced ? 400 : 3200);
     }
